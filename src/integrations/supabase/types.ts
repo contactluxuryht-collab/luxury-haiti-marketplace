@@ -14,7 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orders: {
+        Row: {
+          buyer_id: string | null
+          created_at: string | null
+          id: string
+          product_id: string
+          status: string | null
+        }
+        Insert: {
+          buyer_id?: string | null
+          created_at?: string | null
+          id?: string
+          product_id: string
+          status?: string | null
+        }
+        Update: {
+          buyer_id?: string | null
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          price: number
+          seller_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          price: number
+          seller_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          price?: number
+          seller_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          auth_id: string
+          created_at: string | null
+          email: string
+          id: string
+          name: string | null
+          role: string
+        }
+        Insert: {
+          auth_id: string
+          created_at?: string | null
+          email: string
+          id?: string
+          name?: string | null
+          role?: string
+        }
+        Update: {
+          auth_id?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string | null
+          role?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
