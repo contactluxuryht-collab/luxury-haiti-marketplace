@@ -1,13 +1,23 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "./AppSidebar"
 import { Button } from "@/components/ui/button"
-import { Bell } from "lucide-react"
+import { Bell, LogOut } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+import { useNavigate } from "react-router-dom"
 
 interface MainLayoutProps {
   children: React.ReactNode
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
+  const { user, signOut } = useAuth()
+  const navigate = useNavigate()
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate("/")
+  }
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -30,9 +40,22 @@ export function MainLayout({ children }: MainLayoutProps) {
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"></span>
               </Button>
               
-              <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground text-sm font-semibold">U</span>
-              </div>
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
+                    <span className="text-primary-foreground text-sm font-semibold">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button variant="outline" onClick={() => navigate("/auth")}>
+                  Sign In to Sell
+                </Button>
+              )}
             </div>
           </header>
 
