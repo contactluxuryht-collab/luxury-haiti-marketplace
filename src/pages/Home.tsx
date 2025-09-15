@@ -1,4 +1,4 @@
-import { SearchIcon, Filter, TrendingUp } from "lucide-react"
+import { SearchIcon, Filter, TrendingUp, Menu, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ProductCard } from "@/components/marketplace/ProductCard"
@@ -85,22 +85,22 @@ export default function Home() {
         
         <div className="relative px-8 py-16 md:py-24">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-6xl font-bold text-primary-foreground mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
               Discover 
               <span className="block bg-gradient-sunset bg-clip-text text-transparent">
                 Luxury Haiti
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 leading-relaxed">
+            <p className="text-lg md:text-xl text-white/95 mb-8 leading-relaxed drop-shadow-md">
               Explore premium handcrafted products from talented Haitian artisans. 
               From exquisite jewelry to traditional textiles, discover the beauty of Haiti's craftsmanship.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="hero" size="hero" className="shadow-elevated">
-                <TrendingUp className="mr-2 h-5 w-5" />
-                Explore Marketplace
-              </Button>
-              <Button variant="outline" size="hero" className="border-white/20 text-white hover:bg-white/10">
+          <Button variant="hero" size="hero" className="shadow-elevated bg-white text-primary hover:bg-white/90">
+            <TrendingUp className="mr-2 h-5 w-5" />
+            Explore Marketplace
+          </Button>
+          <Button variant="outline" size="hero" className="border-white/30 text-white hover:bg-white/20 backdrop-blur-sm">
                 Learn More
               </Button>
             </div>
@@ -108,34 +108,57 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Search and Filters */}
+      {/* AliExpress-style Search Bar */}
       <section className="space-y-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+          {/* All Categories Button */}
+          <div className="lg:w-48">
+            <Button 
+              variant="default" 
+              className="w-full h-12 justify-between bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
+            >
+              <div className="flex items-center gap-2">
+                <Menu className="h-4 w-4" />
+                All Categories
+              </div>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          {/* Search Bar */}
+          <div className="flex-1 flex gap-4">
+            <div className="relative flex-1">
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
               <Input
-                placeholder="Search luxury products..."
-                className="pl-10 h-12 bg-card border-border/50"
+                placeholder="Search for products, brands and more..."
+                className="pl-10 h-12 bg-background border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
+            
+            <Button variant="default" className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90">
+              Search
+            </Button>
           </div>
           
           <div className="flex gap-2 items-center">
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2 h-12 border-border text-foreground hover:bg-accent">
               <Filter className="h-4 w-4" />
               Filters
             </Button>
           </div>
         </div>
 
-        {/* Categories */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        {/* Categories Tabs */}
+        <div className="flex gap-2 overflow-x-auto pb-2 border-b border-border">
           {categories.map((category) => (
             <Button
               key={category}
-              variant={category === "All" ? "luxury" : "outline"}
-              className="whitespace-nowrap"
+              variant={category === "All" ? "default" : "ghost"}
+              className={`whitespace-nowrap border-b-2 rounded-none ${
+                category === "All" 
+                  ? "border-primary bg-primary/10 text-primary" 
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-transparent"
+              }`}
               size="sm"
             >
               {category}
