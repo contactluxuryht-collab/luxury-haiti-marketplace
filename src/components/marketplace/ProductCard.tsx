@@ -14,6 +14,7 @@ interface ProductCardProps {
   }
   onAddToWishlist?: (id: string) => void
   onViewProduct?: (id: string) => void
+  isInWishlist?: boolean
 }
 
 export function ProductCard({
@@ -25,6 +26,7 @@ export function ProductCard({
   seller,
   onAddToWishlist,
   onViewProduct,
+  isInWishlist = false,
 }: ProductCardProps) {
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-elevated hover:scale-105 bg-gradient-card backdrop-blur-sm border-border/50">
@@ -38,10 +40,14 @@ export function ProductCard({
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-3 right-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white opacity-0 group-hover:opacity-100 transition-all duration-300"
+          className={`absolute top-3 right-3 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 ${
+            isInWishlist 
+              ? "bg-red-500/20 hover:bg-red-500/30 text-red-500" 
+              : "bg-white/20 hover:bg-white/30 text-white"
+          }`}
           onClick={() => onAddToWishlist?.(id)}
         >
-          <Heart className="h-4 w-4" />
+          <Heart className={`h-4 w-4 ${isInWishlist ? "fill-current" : ""}`} />
         </Button>
       </div>
       

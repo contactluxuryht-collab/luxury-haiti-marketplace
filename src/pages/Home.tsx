@@ -85,22 +85,22 @@ export default function Home() {
         
         <div className="relative px-8 py-16 md:py-24">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight drop-shadow-lg">
               Discover 
               <span className="block bg-gradient-sunset bg-clip-text text-transparent">
                 Luxury Haiti
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-white/95 mb-8 leading-relaxed drop-shadow-md">
+            <p className="text-lg md:text-xl text-foreground/80 mb-8 leading-relaxed drop-shadow-md">
               Explore premium handcrafted products from talented Haitian artisans. 
               From exquisite jewelry to traditional textiles, discover the beauty of Haiti's craftsmanship.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-          <Button variant="hero" size="hero" className="shadow-elevated bg-white text-primary hover:bg-white/90">
+          <Button variant="hero" size="hero" className="shadow-elevated bg-primary text-primary-foreground hover:bg-primary/90">
             <TrendingUp className="mr-2 h-5 w-5" />
             Explore Marketplace
           </Button>
-          <Button variant="outline" size="hero" className="border-white/30 text-white hover:bg-white/20 backdrop-blur-sm">
+          <Button variant="outline" size="hero" className="border-foreground/30 text-foreground hover:bg-foreground/10 backdrop-blur-sm">
                 Learn More
               </Button>
             </div>
