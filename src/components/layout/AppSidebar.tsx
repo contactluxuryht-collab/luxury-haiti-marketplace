@@ -37,12 +37,15 @@ export function AppSidebar() {
   const currentPath = location.pathname
   const collapsed = state === "collapsed"
   const { user } = useAuth()
+  const role = (user?.user_metadata as any)?.role as string | undefined
 
   const isActive = (path: string) => currentPath === path
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive 
-      ? "bg-primary text-primary-foreground shadow-luxury" 
-      : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200"
+      ? "bg-primary text-primary-foreground shadow-luxury"
+      : "!bg-primary text-primary-foreground hover:!bg-primary/90 transition-all duration-200"
+
+  const menuButtonStaticCls = "!bg-primary !text-primary-foreground hover:!bg-primary focus:!bg-primary active:!bg-primary data-[active=true]:!bg-primary data-[active=true]:!text-primary-foreground"
 
   return (
     <Sidebar
@@ -76,7 +79,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className={menuButtonStaticCls}>
                     <NavLink to={item.url} end className={getNavCls}>
                       <item.icon className="h-5 w-5" />
                       {!collapsed && <span className="font-medium">{item.title}</span>}
@@ -88,8 +91,8 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Seller Section - Only show if authenticated */}
-        {user && (
+        {/* Seller Section - Only show if authenticated and role is seller */}
+        {user && role === 'seller' && (
           <SidebarGroup>
             <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
               {!collapsed && "Sell"}
@@ -98,7 +101,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 {sellerItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild className={menuButtonStaticCls}>
                       <NavLink to={item.url} className={getNavCls}>
                         <item.icon className="h-5 w-5" />
                         {!collapsed && <span className="font-medium">{item.title}</span>}
@@ -131,7 +134,7 @@ export function AppSidebar() {
                 ))
               ) : (
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className={menuButtonStaticCls}>
                     <NavLink to="/auth" className={getNavCls}>
                       <LogIn className="h-5 w-5" />
                       {!collapsed && <span className="font-medium">Sign In to Sell</span>}

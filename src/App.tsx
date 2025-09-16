@@ -13,6 +13,10 @@ import SellerDashboard from "./pages/SellerDashboard";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import ProductDetail from "./pages/ProductDetail";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Help from "./pages/Help";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +55,26 @@ const App = () => (
             <Route path="/seller" element={
               <MainLayout>
                 <SellerDashboard />
+              </MainLayout>
+            } />
+            <Route path="/product/:id" element={
+              <MainLayout>
+                <ProductDetail />
+              </MainLayout>
+            } />
+            <Route path="/privacy" element={
+              <MainLayout>
+                <Privacy />
+              </MainLayout>
+            } />
+            <Route path="/terms" element={
+              <MainLayout>
+                <Terms />
+              </MainLayout>
+            } />
+            <Route path="/help" element={
+              <MainLayout>
+                <Help />
               </MainLayout>
             } />
             <Route path="/profile" element={

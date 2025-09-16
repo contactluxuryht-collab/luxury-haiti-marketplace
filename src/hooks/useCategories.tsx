@@ -23,7 +23,21 @@ export function useCategories() {
         .order('name')
 
       if (error) throw error
-      setCategories(data || [])
+      const fetched = data || []
+      const hasAdults = fetched.some((c) => (c.name || '').toLowerCase().includes('18+'))
+      const augmented = hasAdults
+        ? fetched
+        : [
+            ...fetched,
+            {
+              id: '18plus',
+              name: '18+ (Adults)',
+              description: 'Adult products such as vaping and other age-restricted items',
+              image_url: null,
+              created_at: new Date().toISOString(),
+            },
+          ]
+      setCategories(augmented)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {

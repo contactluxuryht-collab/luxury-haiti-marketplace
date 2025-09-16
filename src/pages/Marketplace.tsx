@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { SearchIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,6 +6,16 @@ import { ProductCard } from "@/components/marketplace/ProductCard"
 import { useProducts } from "@/hooks/useProducts"
 import { useCategories } from "@/hooks/useCategories"
 import { useWishlist } from "@/hooks/useWishlist"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export default function Marketplace() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -13,6 +23,29 @@ export default function Marketplace() {
   const { products, loading: productsLoading } = useProducts()
   const { categories, loading: categoriesLoading } = useCategories()
   const { addToWishlist, isInWishlist } = useWishlist()
+
+  const [showAgeGate, setShowAgeGate] = useState(false)
+  const [pendingAdultsCategoryId, setPendingAdultsCategoryId] = useState<string | null>(null)
+
+  const isAdultsCategory = (categoryId: string) => {
+    const cat = categories.find((c) => c.id === categoryId)
+    if (!cat) return false
+    const name = (cat.name || "").toLowerCase()
+    return name.includes("18+") || name.includes("adult")
+  }
+
+  const hasVerifiedAge = useMemo(() => {
+    return localStorage.getItem("ageVerified18") === "true"
+  }, [])
+
+  useEffect(() => {
+    // If we already verified in a previous session, proceed with pending selection
+    if (hasVerifiedAge && pendingAdultsCategoryId) {
+      setSelectedCategory(pendingAdultsCategoryId)
+      setPendingAdultsCategoryId(null)
+      setShowAgeGate(false)
+    }
+  }, [hasVerifiedAge, pendingAdultsCategoryId])
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = !searchQuery || 
@@ -29,8 +62,9 @@ export default function Marketplace() {
   }
 
   const handleViewProduct = (productId: string) => {
-    console.log("View product:", productId)
-    // Navigate to product detail page
+    // Use our mock ids for now if missing
+    const idToUse = productId || 'p1'
+    window.location.assign(`/product/${idToUse}`)
   }
 
   if (productsLoading || categoriesLoading) {
@@ -51,6 +85,7 @@ export default function Marketplace() {
   }
 
   return (
+    <>
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Marketplace</h1>
@@ -84,7 +119,18 @@ export default function Marketplace() {
             <Button
               key={category.id}
               variant={selectedCategory === category.id ? "default" : "outline"}
-              onClick={() => setSelectedCategory(category.id)}
+              onClick={() => {
+                if (isAdultsCategory(category.id)) {
+                  if (localStorage.getItem("ageVerified18") === "true") {
+                    setSelectedCategory(category.id)
+                  } else {
+                    setPendingAdultsCategoryId(category.id)
+                    setShowAgeGate(true)
+                  }
+                } else {
+                  setSelectedCategory(category.id)
+                }
+              }}
               size="sm"
               className="whitespace-nowrap"
             >
@@ -129,5 +175,31 @@ export default function Marketplace() {
         </div>
       )}
     </div>
+    <AlertDialog open={showAgeGate} onOpenChange={setShowAgeGate}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Age Verification</AlertDialogTitle>
+          <AlertDialogDescription>
+            This category contains adult-only products (18+), including items like vaping and other age-restricted goods.
+            Please confirm you are at least 18 years old to continue.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => {
+            setShowAgeGate(false)
+            setPendingAdultsCategoryId(null)
+          }}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={() => {
+            localStorage.setItem("ageVerified18", "true")
+            if (pendingAdultsCategoryId) {
+              setSelectedCategory(pendingAdultsCategoryId)
+            }
+            setPendingAdultsCategoryId(null)
+            setShowAgeGate(false)
+          }}>I am 18 or older</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   )
 }

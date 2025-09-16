@@ -20,7 +20,7 @@ export function Footer() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Discover authentic Haitian crafts and premium products from talented sellers across Haiti and beyond.
+              We're a modern marketplace where you can find anything—from fashion and electronics to home essentials and more.
             </p>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <span>Made with</span>
@@ -52,17 +52,17 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-foreground mb-4">Popular Categories</h4>
             <div className="space-y-2">
-              <Link to="/marketplace?category=traditional-crafts" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Traditional Crafts
-              </Link>
               <Link to="/marketplace?category=jewelry-accessories" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 Jewelry & Accessories
               </Link>
-              <Link to="/marketplace?category=coffee-spices" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Coffee & Spices
+              <Link to="/marketplace?category=fashion" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Fashion
               </Link>
-              <Link to="/marketplace?category=art-paintings" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Art & Paintings
+              <Link to="/marketplace?category=beauty" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Beauty
+              </Link>
+              <Link to="/marketplace?category=sports-outdoors" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Sports & Outdoors
               </Link>
             </div>
           </div>

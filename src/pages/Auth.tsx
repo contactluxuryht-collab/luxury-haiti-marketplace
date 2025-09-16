@@ -15,6 +15,7 @@ export default function Auth() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [role, setRole] = useState<'buyer' | 'seller'>('buyer')
   const navigate = useNavigate()
   const { user } = useAuth()
   const { toast } = useToast()
@@ -33,6 +34,10 @@ export default function Auth() {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     const name = formData.get('name') as string
+    const roleField = (formData.get('role') as 'buyer' | 'seller') || role
+    const businessName = formData.get('businessName') as string
+    const phoneNumber = formData.get('phoneNumber') as string
+    const sellingFocus = formData.get('sellingFocus') as string
 
     try {
       const { error } = await supabase.auth.signUp({
@@ -41,7 +46,11 @@ export default function Auth() {
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            name: name
+            name: name,
+            role: roleField,
+            businessName: roleField === 'seller' ? businessName : undefined,
+            phoneNumber: roleField === 'seller' ? phoneNumber : undefined,
+            sellingFocus: roleField === 'seller' ? sellingFocus : undefined
           }
         }
       })
@@ -187,6 +196,28 @@ export default function Auth() {
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
+                    <Label htmlFor="signup-role">Account Type</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        variant={role === 'buyer' ? 'default' : 'outline'}
+                        onClick={() => setRole('buyer')}
+                        className="w-full"
+                      >
+                        Buyer
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={role === 'seller' ? 'default' : 'outline'}
+                        onClick={() => setRole('seller')}
+                        className="w-full"
+                      >
+                        Seller
+                      </Button>
+                    </div>
+                    <input type="hidden" name="role" value={role} />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="signup-name">Full Name</Label>
                     <Input
                       id="signup-name"
@@ -197,6 +228,45 @@ export default function Auth() {
                       disabled={loading}
                     />
                   </div>
+                  {role === 'seller' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-business-name">Business Name</Label>
+                    <Input
+                      id="signup-business-name"
+                      name="businessName"
+                      type="text"
+                      placeholder="Your business name"
+                      required={role === 'seller'}
+                      disabled={loading}
+                    />
+                  </div>
+                  )}
+                  {role === 'seller' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone">Phone Number</Label>
+                    <Input
+                      id="signup-phone"
+                      name="phoneNumber"
+                      type="tel"
+                      placeholder="e.g. +1 555 123 4567"
+                      required={role === 'seller'}
+                      disabled={loading}
+                    />
+                  </div>
+                  )}
+                  {role === 'seller' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-selling">What do you want to sell?</Label>
+                    <Input
+                      id="signup-selling"
+                      name="sellingFocus"
+                      type="text"
+                      placeholder="e.g. Fashion, Electronics, Home & Living"
+                      required={role === 'seller'}
+                      disabled={loading}
+                    />
+                  </div>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input

@@ -59,7 +59,7 @@ const sampleProducts = [
   },
 ]
 
-const categories = ["All", "Jewelry", "Textiles", "Coffee", "Art", "Crafts"]
+const categories = ["All", "Jewelry", "Textiles", "Coffee", "Art", "Crafts", "18+ (Adults)"]
 
 export default function Home() {
   const handleAddToWishlist = (id: string) => {
@@ -92,11 +92,10 @@ export default function Home() {
               </span>
             </h1>
             <p className="text-lg md:text-xl text-foreground/80 mb-8 leading-relaxed drop-shadow-md">
-              Explore premium handcrafted products from talented Haitian artisans. 
-              From exquisite jewelry to traditional textiles, discover the beauty of Haiti's craftsmanship.
+              We’re a modern marketplace where you can find anything—from fashion and electronics to home essentials and more.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-          <Button variant="hero" size="hero" className="shadow-elevated bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button variant="hero" size="hero" className="shadow-elevated bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => window.location.assign('/marketplace')}>
             <TrendingUp className="mr-2 h-5 w-5" />
             Explore Marketplace
           </Button>
@@ -172,15 +171,37 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Featured Products</h2>
-            <p className="text-muted-foreground">Handpicked luxury items from our best artisans</p>
+            <p className="text-muted-foreground">Handpicked top items from our best sellers</p>
           </div>
-          <Button variant="luxury">View All</Button>
+          <Button variant="luxury" onClick={() => window.location.assign('/marketplace')}>View All</Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sampleProducts.map((product) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {sampleProducts.slice(0, 4).map((product) => (
             <ProductCard
               key={product.id}
+              {...product}
+              onAddToWishlist={handleAddToWishlist}
+              onViewProduct={handleViewProduct}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Best Sellers */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Best Sellers</h2>
+            <p className="text-muted-foreground">Our most popular products this week</p>
+          </div>
+          <Button variant="luxury" onClick={() => window.location.assign('/marketplace')}>View All</Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {sampleProducts.slice(0, 4).map((product) => (
+            <ProductCard
+              key={`best-${product.id}`}
               {...product}
               onAddToWishlist={handleAddToWishlist}
               onViewProduct={handleViewProduct}
@@ -196,8 +217,8 @@ export default function Home() {
           <div className="text-muted-foreground">Premium Products</div>
         </div>
         <div className="text-center p-6 rounded-xl bg-gradient-card backdrop-blur-sm border border-border/50">
-          <div className="text-3xl font-bold bg-gradient-luxury bg-clip-text text-transparent mb-2">100+</div>
-          <div className="text-muted-foreground">Verified Artisans</div>
+          <div className="text-3xl font-bold bg-gradient-luxury bg-clip-text text-transparent mb-2">10+</div>
+          <div className="text-muted-foreground">Verified Vendors</div>
         </div>
         <div className="text-center p-6 rounded-xl bg-gradient-card backdrop-blur-sm border border-border/50">
           <div className="text-3xl font-bold bg-gradient-luxury bg-clip-text text-transparent mb-2">98%</div>
