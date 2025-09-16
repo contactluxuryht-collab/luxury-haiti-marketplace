@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "./AppSidebar"
+import { Footer } from "./Footer"
 import { Button } from "@/components/ui/button"
 import { Bell, LogOut } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
@@ -63,6 +64,9 @@ export function MainLayout({ children }: MainLayoutProps) {
           <main className="flex-1 p-6">
             {children}
           </main>
+          
+          {/* Footer */}
+          <Footer />
         </div>
       </div>
     </SidebarProvider>

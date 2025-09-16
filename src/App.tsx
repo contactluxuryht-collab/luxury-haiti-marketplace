@@ -23,19 +23,47 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <MainLayout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/seller" element={<SellerDashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/auth" element={<Auth />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </MainLayout>
+          <Routes>
+            {/* Standalone auth page without layout */}
+            <Route path="/auth" element={<Auth />} />
+            
+            {/* All other pages use MainLayout */}
+            <Route path="/" element={
+              <MainLayout>
+                <Home />
+              </MainLayout>
+            } />
+            <Route path="/marketplace" element={
+              <MainLayout>
+                <Marketplace />
+              </MainLayout>
+            } />
+            <Route path="/search" element={
+              <MainLayout>
+                <Search />
+              </MainLayout>
+            } />
+            <Route path="/wishlist" element={
+              <MainLayout>
+                <Wishlist />
+              </MainLayout>
+            } />
+            <Route path="/seller" element={
+              <MainLayout>
+                <SellerDashboard />
+              </MainLayout>
+            } />
+            <Route path="/profile" element={
+              <MainLayout>
+                <Profile />
+              </MainLayout>
+            } />
+            <Route path="*" element={
+              <MainLayout>
+                <NotFound />
+              </MainLayout>
+            } />
+          </Routes>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
