@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Plus, Package, DollarSign, ShoppingCart, Edit, Trash2, Upload, X } from "lucide-react"
+import { Loader2, Plus, Package, DollarSign, ShoppingCart, Edit, Trash2, Upload, X, CheckCircle, XCircle, AlertCircle } from "lucide-react"
 import { useProducts } from "@/hooks/useProducts"
 import { useCategories } from "@/hooks/useCategories"
 
@@ -54,14 +54,67 @@ export default function SellerDashboard() {
     totalRevenue: 0,
     pendingOrders: 0
   })
+  const [sellerApproved, setSellerApproved] = useState<boolean | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
     if (user && products) {
       fetchUserProducts()
       fetchStats()
+      fetchSellerApproval()
     }
   }, [user, products])
+
+  // Real-time subscription for approval status changes
+  useEffect(() => {
+    if (!user) return
+
+    const channel = supabase
+      .channel('seller-approval')
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'users',
+          filter: `auth_id=eq.${user.id}`
+        }, 
+        (payload) => {
+          const newData = payload.new as any
+          if (newData.seller_approved !== undefined) {
+            setSellerApproved(newData.seller_approved)
+            toast({
+              title: newData.seller_approved ? 'Account Approved!' : 'Account Status Updated',
+              description: newData.seller_approved 
+                ? 'Your seller account has been approved. You can now add products!'
+                : 'Your account status has been updated.'
+            })
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user, toast])
+
+  const fetchSellerApproval = async () => {
+    if (!user) return
+
+    try {
+      const { data: sellerData, error } = await supabase
+        .from('users')
+        .select('seller_approved')
+        .eq('auth_id', user.id)
+        .single()
+
+      if (error) throw error
+      setSellerApproved(sellerData?.seller_approved || false)
+    } catch (error) {
+      console.error('Error fetching seller approval status:', error)
+      setSellerApproved(false)
+    }
+  }
 
   const fetchUserProducts = async () => {
     if (!user) return
@@ -181,6 +234,19 @@ export default function SellerDashboard() {
     setSaving(true)
     setFormError(null)
     try {
+      // Check seller approval
+      const { data: sellerRow, error: sellerErr } = await supabase
+        .from('users')
+        .select('seller_approved')
+        .eq('auth_id', user.id)
+        .single()
+      if (sellerErr) throw sellerErr
+      if (!sellerRow?.seller_approved) {
+        setFormError('Your seller account is pending approval. Please wait for admin approval before posting products.')
+        setSaving(false)
+        return
+      }
+
       const priceNumber = parseFloat(newProduct.price as any)
       const quantityNumber = parseInt(newProduct.quantity as any)
       const weightNumber = parseFloat(newProduct.weight as any)
@@ -262,6 +328,49 @@ Product Details:
         <h1 className="text-3xl font-bold text-foreground">Seller Dashboard</h1>
         <p className="text-muted-foreground">Manage your products and track your sales</p>
       </div>
+
+      {/* Approval Status Banner */}
+      {sellerApproved === false && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2">
+              <XCircle className="h-5 w-5 text-red-600" />
+              <div>
+                <h3 className="font-semibold text-red-800">Account Not Approved</h3>
+                <p className="text-red-700">Your seller account has been denied. You cannot add products until approved by an administrator.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {sellerApproved === null && (
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600" />
+              <div>
+                <h3 className="font-semibold text-yellow-800">Pending Approval</h3>
+                <p className="text-yellow-700">Your seller account is pending approval. You cannot add products until approved by an administrator.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {sellerApproved === true && (
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <div>
+                <h3 className="font-semibold text-green-800">Account Approved</h3>
+                <p className="text-green-700">Your seller account is approved. You can now add and manage products.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -299,6 +408,43 @@ Product Details:
         </Card>
       </div>
 
+      {/* Approval Status */}
+      {sellerApproved === false && (
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                <Package className="h-4 w-4 text-yellow-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-yellow-800">Account Pending Approval</h3>
+                <p className="text-sm text-yellow-700">
+                  Your seller account is currently under review. You'll be able to add products once approved by our admin team.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {sellerApproved === true && (
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <Package className="h-4 w-4 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-green-800">Account Approved</h3>
+                <p className="text-sm text-green-700">
+                  Your seller account has been approved! You can now add and manage your products.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Products Section */}
       <Card className="border-border/50">
         <CardHeader>
@@ -307,7 +453,11 @@ Product Details:
               <CardTitle>Your Products</CardTitle>
               <CardDescription>Manage your product listings</CardDescription>
             </div>
-            <Button onClick={handleOpenAdd}>
+            <Button 
+              onClick={handleOpenAdd}
+              disabled={sellerApproved === false}
+              className={sellerApproved === false ? "opacity-50 cursor-not-allowed" : ""}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Product
             </Button>

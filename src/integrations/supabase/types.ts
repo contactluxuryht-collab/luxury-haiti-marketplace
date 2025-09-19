@@ -20,6 +20,9 @@ export type Database = {
           id: string
           product_id: string
           quantity: number
+          selected_color: string | null
+          selected_size: string | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
@@ -27,6 +30,9 @@ export type Database = {
           id?: string
           product_id: string
           quantity?: number
+          selected_color?: string | null
+          selected_size?: string | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
@@ -34,6 +40,9 @@ export type Database = {
           id?: string
           product_id?: string
           quantity?: number
+          selected_color?: string | null
+          selected_size?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -82,22 +91,49 @@ export type Database = {
           buyer_id: string | null
           created_at: string | null
           id: string
+          notes: string | null
+          payment_method: string | null
+          payment_status: string | null
+          price_per_unit: number | null
           product_id: string
+          quantity: number | null
+          seller_id: string | null
+          shipping_address: Json | null
           status: string | null
+          total_amount: number | null
+          updated_at: string | null
         }
         Insert: {
           buyer_id?: string | null
           created_at?: string | null
           id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          price_per_unit?: number | null
           product_id: string
+          quantity?: number | null
+          seller_id?: string | null
+          shipping_address?: Json | null
           status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
         }
         Update: {
           buyer_id?: string | null
           created_at?: string | null
           id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          price_per_unit?: number | null
           product_id?: string
+          quantity?: number | null
+          seller_id?: string | null
+          shipping_address?: Json | null
           status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -114,38 +150,63 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "orders_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
         ]
       }
       products: {
         Row: {
           category_id: string | null
+          colors: string[] | null
           created_at: string | null
           description: string | null
           id: string
           image_url: string | null
+          is_active: boolean | null
           price: number
+          quantity: number | null
           seller_id: string
+          size: string | null
           title: string
+          updated_at: string | null
+          weight: number | null
         }
         Insert: {
           category_id?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description?: string | null
           id?: string
           image_url?: string | null
+          is_active?: boolean | null
           price: number
+          quantity?: number | null
           seller_id: string
+          size?: string | null
           title: string
+          updated_at?: string | null
+          weight?: number | null
         }
         Update: {
           category_id?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description?: string | null
           id?: string
           image_url?: string | null
+          is_active?: boolean | null
           price?: number
+          quantity?: number | null
           seller_id?: string
+          size?: string | null
           title?: string
+          updated_at?: string | null
+          weight?: number | null
         }
         Relationships: [
           {
@@ -211,32 +272,55 @@ export type Database = {
           comment: string | null
           created_at: string | null
           id: string
+          order_id: string | null
           product_id: string
           rating: number
+          seller_id: string | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           comment?: string | null
           created_at?: string | null
           id?: string
+          order_id?: string | null
           product_id: string
           rating: number
+          seller_id?: string | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           comment?: string | null
           created_at?: string | null
           id?: string
+          order_id?: string | null
           product_id?: string
           rating?: number
+          seller_id?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reviews_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -251,27 +335,39 @@ export type Database = {
       users: {
         Row: {
           auth_id: string
+          business_name: string | null
           created_at: string | null
           email: string
           id: string
           name: string | null
+          phone_number: string | null
           role: string
+          selling_focus: string | null
+          updated_at: string | null
         }
         Insert: {
           auth_id: string
+          business_name?: string | null
           created_at?: string | null
           email: string
           id?: string
           name?: string | null
+          phone_number?: string | null
           role?: string
+          selling_focus?: string | null
+          updated_at?: string | null
         }
         Update: {
           auth_id?: string
+          business_name?: string | null
           created_at?: string | null
           email?: string
           id?: string
           name?: string | null
+          phone_number?: string | null
           role?: string
+          selling_focus?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

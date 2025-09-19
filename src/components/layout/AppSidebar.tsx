@@ -31,6 +31,10 @@ const accountItems = [
   { title: "Profile", url: "/profile", icon: User },
 ]
 
+const adminItems = [
+  { title: "Admin", url: "/admin", icon: User },
+]
+
 export function AppSidebar() {
   const { state } = useSidebar()
   const location = useLocation()
@@ -100,6 +104,29 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {sellerItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className={menuButtonStaticCls}>
+                      <NavLink to={item.url} className={getNavCls}>
+                        <item.icon className="h-5 w-5" />
+                        {!collapsed && <span className="font-medium">{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Admin Section */}
+        {user && role === 'admin' && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
+              {!collapsed && "Admin"}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild className={menuButtonStaticCls}>
                       <NavLink to={item.url} className={getNavCls}>

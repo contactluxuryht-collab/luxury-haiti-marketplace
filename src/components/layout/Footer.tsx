@@ -52,17 +52,17 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-foreground mb-4">Popular Categories</h4>
             <div className="space-y-2">
-              <Link to="/marketplace?category=jewelry-accessories" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Jewelry & Accessories
+              <Link to="/marketplace?category=electronics" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Electronics
               </Link>
-              <Link to="/marketplace?category=fashion" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Fashion
+              <Link to="/marketplace?category=phones-accessories" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Phones & Accessories
               </Link>
-              <Link to="/marketplace?category=beauty" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Beauty
+              <Link to="/marketplace?category=computers-laptops" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Computers & Laptops
               </Link>
-              <Link to="/marketplace?category=sports-outdoors" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Sports & Outdoors
+              <Link to="/marketplace?category=audio-headphones" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Audio & Headphones
               </Link>
             </div>
           </div>
@@ -73,15 +73,15 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">hello@luxuryhaiti.com</span>
+                <span className="text-sm text-muted-foreground">contactluxuryht@gmail.com</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">+509 xxxx-xxxx</span>
+                <span className="text-sm text-muted-foreground">+509 33 69 61 05</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Port-au-Prince, Haiti</span>
+                <span className="text-sm text-muted-foreground">Cap-haitien, Haiti</span>
               </div>
             </div>
           </div>

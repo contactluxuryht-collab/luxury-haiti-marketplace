@@ -2,7 +2,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "./AppSidebar"
 import { Footer } from "./Footer"
 import { Button } from "@/components/ui/button"
-import { Bell, LogOut } from "lucide-react"
+import { Bell, LogOut, Shield } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigate } from "react-router-dom"
 
@@ -48,14 +48,26 @@ export function MainLayout({ children }: MainLayoutProps) {
                       {user.email?.charAt(0).toUpperCase()}
                     </span>
                   </div>
+                  {(user.user_metadata as any)?.role === 'admin' && (
+                    <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin
+                    </Button>
+                  )}
                   <Button variant="ghost" size="icon" onClick={handleSignOut}>
                     <LogOut className="h-4 w-4" />
                   </Button>
                 </div>
               ) : (
-                <Button variant="outline" onClick={() => navigate("/auth")}>
-                  Sign In to Sell
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={() => navigate("/auth")}>
+                    Sign In to Sell
+                  </Button>
+                  <Button variant="ghost" onClick={() => navigate("/admin/login")}>
+                    <Shield className="h-4 w-4 mr-2" />
+                    Admin Login
+                  </Button>
+                </div>
               )}
             </div>
           </header>

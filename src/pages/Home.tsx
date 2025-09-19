@@ -11,55 +11,71 @@ import productCoffee from "@/assets/product-coffee.jpg"
 const sampleProducts = [
   {
     id: "1",
-    title: "Handcrafted Coral Necklace",
-    description: "Exquisite handmade jewelry featuring traditional Haitian coral patterns with gold accents",
-    price: 299,
+    title: "iPhone 15 Pro Max Case",
+    description: "Premium protective case with crystal clear design and military-grade protection",
+    price: 89,
     imageUrl: productJewelry,
-    seller: { name: "Marie Artisan", avatar: "" }
+    seller: { name: "Tech Haiti", avatar: "" }
   },
   {
     id: "2", 
-    title: "Traditional Woven Textile",
-    description: "Beautiful artisan textile with authentic Haitian patterns, perfect for luxury home decor",
-    price: 199,
+    title: "Wireless Fast Charger",
+    description: "15W wireless charging pad with LED indicator and anti-slip design",
+    price: 45,
     imageUrl: productTextile,
-    seller: { name: "Jean Baptiste", avatar: "" }
+    seller: { name: "Power Solutions", avatar: "" }
   },
   {
     id: "3",
-    title: "Premium Mountain Coffee",
-    description: "Single-origin coffee beans from Haiti's mountain regions, roasted to perfection",
-    price: 45,
+    title: "Portable Power Bank 20000mAh",
+    description: "High-capacity power bank with fast charging and multiple USB ports",
+    price: 75,
     imageUrl: productCoffee,
-    seller: { name: "Café Haiti", avatar: "" }
+    seller: { name: "Energy Plus", avatar: "" }
   },
   {
     id: "4",
-    title: "Handcrafted Coral Necklace",
-    description: "Exquisite handmade jewelry featuring traditional Haitian coral patterns with gold accents",
-    price: 299,
+    title: "MacBook Pro 16-inch",
+    description: "Latest MacBook Pro with M3 chip, 16GB RAM, and 512GB SSD storage",
+    price: 2499,
     imageUrl: productJewelry,
-    seller: { name: "Marie Artisan", avatar: "" }
+    seller: { name: "Apple Haiti", avatar: "" }
   },
   {
     id: "5", 
-    title: "Traditional Woven Textile",
-    description: "Beautiful artisan textile with authentic Haitian patterns, perfect for luxury home decor",
-    price: 199,
+    title: "Samsung Galaxy S24 Ultra",
+    description: "Flagship smartphone with 200MP camera and S Pen stylus",
+    price: 1299,
     imageUrl: productTextile,
-    seller: { name: "Jean Baptiste", avatar: "" }
+    seller: { name: "Mobile World", avatar: "" }
   },
   {
     id: "6",
-    title: "Premium Mountain Coffee",
-    description: "Single-origin coffee beans from Haiti's mountain regions, roasted to perfection",
-    price: 45,
+    title: "AirPods Pro 2nd Gen",
+    description: "Active noise cancellation wireless earbuds with spatial audio",
+    price: 249,
     imageUrl: productCoffee,
-    seller: { name: "Café Haiti", avatar: "" }
+    seller: { name: "Audio Tech", avatar: "" }
+  },
+  {
+    id: "7",
+    title: "Gaming Laptop RTX 4060",
+    description: "High-performance gaming laptop with RTX 4060 graphics and 16GB RAM",
+    price: 1299,
+    imageUrl: productJewelry,
+    seller: { name: "Gaming Zone", avatar: "" }
+  },
+  {
+    id: "8",
+    title: "Smart Watch Series 9",
+    description: "Advanced smartwatch with health monitoring and GPS tracking",
+    price: 399,
+    imageUrl: productTextile,
+    seller: { name: "Wearable Tech", avatar: "" }
   },
 ]
 
-const categories = ["All", "Jewelry", "Textiles", "Coffee", "Art", "Crafts", "18+ (Adults)"]
+const categories = ["All", "Electronics", "Phones & Accessories", "Computers & Laptops", "Audio & Headphones", "Gaming", "18+ (Adults)"]
 
 export default function Home() {
   const handleAddToWishlist = (id: string) => {
@@ -85,21 +101,21 @@ export default function Home() {
         
         <div className="relative px-8 py-16 md:py-24">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
               Discover 
-              <span className="block bg-gradient-sunset bg-clip-text text-transparent">
+              <span className="block text-white">
                 Luxury Haiti
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-foreground/80 mb-8 leading-relaxed drop-shadow-md">
-              We’re a modern marketplace where you can find anything—from fashion and electronics to home essentials and more.
+            <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed drop-shadow-md">
+              We're a modern marketplace where you can find anything—from fashion and electronics to home essentials and more.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
           <Button variant="hero" size="hero" className="shadow-elevated bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => window.location.assign('/marketplace')}>
             <TrendingUp className="mr-2 h-5 w-5" />
             Explore Marketplace
           </Button>
-          <Button variant="outline" size="hero" className="border-foreground/30 text-foreground hover:bg-foreground/10 backdrop-blur-sm">
+          <Button variant="outline" size="hero" className="border-foreground/30 text-foreground hover:bg-foreground/10 backdrop-blur-sm" onClick={() => window.location.assign('/about')}>
                 Learn More
               </Button>
             </div>

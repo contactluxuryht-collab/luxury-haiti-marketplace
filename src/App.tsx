@@ -11,12 +11,15 @@ import Search from "./pages/Search";
 import Wishlist from "./pages/Wishlist";
 import SellerDashboard from "./pages/SellerDashboard";
 import Profile from "./pages/Profile";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Help from "./pages/Help";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +60,12 @@ const App = () => (
                 <SellerDashboard />
               </MainLayout>
             } />
+            <Route path="/admin" element={
+              <MainLayout>
+                <AdminDashboard />
+              </MainLayout>
+            } />
+            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/product/:id" element={
               <MainLayout>
                 <ProductDetail />
@@ -75,6 +84,11 @@ const App = () => (
             <Route path="/help" element={
               <MainLayout>
                 <Help />
+              </MainLayout>
+            } />
+            <Route path="/about" element={
+              <MainLayout>
+                <About />
               </MainLayout>
             } />
             <Route path="/profile" element={

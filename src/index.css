@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white;
+  }
+}
+
 /* Luxury Haiti Marketplace Design System - Spotify-inspired with Haitian warmth */
 
 @layer base {

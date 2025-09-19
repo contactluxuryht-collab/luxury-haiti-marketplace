@@ -8,7 +8,14 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:apply:schema": "node scripts/apply-sql.mjs supabase-schema.sql",
+    "db:apply:complete": "node scripts/apply-sql.mjs supabase-complete-setup.sql",
+    "db:apply:direct": "node scripts/apply-sql-direct.mjs supabase-complete-setup.sql",
+    "db:setup": "node scripts/apply-sql-client.mjs",
+    "db:apply:users-policy": "node scripts/apply-sql.mjs supabase/users-public-policy.sql",
+    "db:apply:seller-approval": "node scripts/apply-sql.mjs supabase/seller-approval.sql",
+    "create-admin": "node scripts/create-admin.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -79,6 +86,7 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "pg": "^8.12.0"
   }
 }
