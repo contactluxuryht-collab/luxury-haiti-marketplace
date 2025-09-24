@@ -16,60 +16,60 @@ export function Footer() {
                 <h3 className="text-lg font-bold bg-gradient-luxury bg-clip-text text-transparent">
                   Luxury Haiti
                 </h3>
-                <p className="text-xs text-muted-foreground">Premium Marketplace</p>
+                <p className="text-xs text-muted-foreground">Marché Premium</p>
               </div>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              We're a modern marketplace where you can find anything—from fashion and electronics to home essentials and more.
+              Un marché moderne pour tout trouver : mode, électronique, maison et plus encore.
             </p>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <span>Made with</span>
+              <span>Fait avec</span>
               <Heart className="h-4 w-4 text-red-500 fill-current" />
-              <span>in Haiti</span>
+              <span>en Haïti</span>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Quick Links</h4>
+            <h4 className="font-semibold text-foreground mb-4">Liens rapides</h4>
             <div className="space-y-2">
               <Link to="/" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Home
+                Accueil
               </Link>
               <Link to="/marketplace" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Marketplace
+                Marché
               </Link>
               <Link to="/search" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Search Products
+                Rechercher des produits
               </Link>
               <Link to="/wishlist" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Wishlist
+                Favoris
               </Link>
             </div>
           </div>
 
           {/* Categories */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Popular Categories</h4>
+            <h4 className="font-semibold text-foreground mb-4">Catégories populaires</h4>
             <div className="space-y-2">
               <Link to="/marketplace?category=electronics" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Electronics
+                Électronique
               </Link>
               <Link to="/marketplace?category=phones-accessories" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Phones & Accessories
+                Téléphones & Accessoires
               </Link>
               <Link to="/marketplace?category=computers-laptops" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Computers & Laptops
+                Ordinateurs & Portables
               </Link>
               <Link to="/marketplace?category=audio-headphones" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Audio & Headphones
+                Audio & Casques
               </Link>
             </div>
           </div>
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Contact Us</h4>
+            <h4 className="font-semibold text-foreground mb-4">Nous contacter</h4>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-muted-foreground" />
@@ -81,7 +81,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Cap-haitien, Haiti</span>
+                <span className="text-sm text-muted-foreground">Cap‑Haïtien, Haïti</span>
               </div>
             </div>
           </div>
@@ -89,18 +89,16 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            © 2024 Luxury Haiti. All rights reserved.
-          </p>
+          <p className="text-sm text-muted-foreground">© 2024 Luxury Haiti. Tous droits réservés.</p>
           <div className="flex gap-6">
             <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Privacy Policy
+              Politique de confidentialité
             </Link>
             <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Terms of Service
+              Conditions d’utilisation
             </Link>
             <Link to="/help" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Help Center
+              Centre d’aide
             </Link>
           </div>
         </div>

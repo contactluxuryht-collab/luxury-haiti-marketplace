@@ -349,7 +349,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading admin dashboard...</p>
+          <p>Chargement du tableau de bord administrateur…</p>
         </div>
       </div>
     )
@@ -366,11 +366,11 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h2>
-          <p className="text-muted-foreground mb-4">You need admin privileges to access this page.</p>
-          <p className="text-sm text-muted-foreground">User role: {(user.user_metadata as any)?.role || 'none'}</p>
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Accès refusé</h2>
+          <p className="text-muted-foreground mb-4">Vous devez avoir les privilèges administrateur pour accéder à cette page.</p>
+          <p className="text-sm text-muted-foreground">Rôle utilisateur : {(user.user_metadata as any)?.role || 'aucun'}</p>
           <Button onClick={() => window.location.href = '/admin/login'} className="mt-4">
-            Go to Admin Login
+            Aller à la connexion admin
           </Button>
         </div>
       </div>
@@ -393,14 +393,14 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-4xl font-bold text-foreground flex items-center gap-3">
             <Shield className="h-10 w-10 text-primary" />
-            Admin Dashboard
+            Tableau de bord Admin
           </h1>
-          <p className="text-muted-foreground text-lg">Manage your marketplace with complete control</p>
+          <p className="text-muted-foreground text-lg">Gérez votre marché avec un contrôle complet</p>
         </div>
         <div className="flex items-center gap-3">
           <Button onClick={() => setShowAddProduct(true)} className="bg-gradient-primary hover:opacity-90">
             <Plus className="h-4 w-4 mr-2" />
-            Add Product
+            Ajouter un produit
           </Button>
         </div>
       </div>
@@ -409,54 +409,54 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="border-border/50 hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total utilisateurs</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-foreground">{stats.totalUsers}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <TrendingUp className="h-3 w-3" />
-              +12% from last month
+              +12% par rapport au mois dernier
             </p>
           </CardContent>
         </Card>
 
         <Card className="border-border/50 hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Products</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total produits</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-foreground">{stats.totalProducts}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.activeProducts} active, {stats.inactiveProducts} inactive
+              {stats.activeProducts} actifs, {stats.inactiveProducts} inactifs
             </p>
           </CardContent>
         </Card>
 
         <Card className="border-border/50 hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Orders</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total commandes</CardTitle>
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-foreground">{stats.totalOrders}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Activity className="h-3 w-3" />
-              All time orders
+              Commandes à vie
             </p>
           </CardContent>
         </Card>
 
         <Card className="border-border/50 hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Sellers</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Vendeurs en attente</CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-foreground">{stats.pendingSellers}</div>
             <p className="text-xs text-muted-foreground">
-              Awaiting approval
+              En attente d’approbation
             </p>
           </CardContent>
         </Card>
@@ -465,8 +465,8 @@ export default function AdminDashboard() {
       {/* Main Content Tabs */}
       <Tabs defaultValue="sellers" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="sellers">Sellers Management</TabsTrigger>
-          <TabsTrigger value="products">Products Management</TabsTrigger>
+          <TabsTrigger value="sellers">Gestion des vendeurs</TabsTrigger>
+          <TabsTrigger value="products">Gestion des produits</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sellers" className="space-y-6">
@@ -474,19 +474,19 @@ export default function AdminDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                Sellers Management
+                Gestion des vendeurs
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Nom</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Business</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Focus</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Entreprise</TableHead>
+                    <TableHead>Téléphone</TableHead>
+                    <TableHead>Spécialité</TableHead>
+                    <TableHead>Statut</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -502,12 +502,12 @@ export default function AdminDashboard() {
                         {s.seller_approved ? (
                           <Badge variant="secondary" className="flex items-center gap-1 w-fit">
                             <CheckCircle className="h-3 w-3" />
-                            Approved
+                            Approuvé
                           </Badge>
                         ) : (
                           <Badge variant="outline" className="flex items-center gap-1 w-fit">
                             <XCircle className="h-3 w-3" />
-                            Pending
+                            En attente
                           </Badge>
                         )}
                       </TableCell>
@@ -518,17 +518,17 @@ export default function AdminDashboard() {
                             {s.seller_approved === true ? (
                               <Badge variant="default" className="bg-green-100 text-green-800">
                                 <CheckCircle className="h-3 w-3 mr-1" />
-                                Approved
+                                Approuvé
                               </Badge>
                             ) : s.seller_approved === false ? (
                               <Badge variant="destructive">
                                 <XCircle className="h-3 w-3 mr-1" />
-                                Denied
+                                Refusé
                               </Badge>
                             ) : (
                               <Badge variant="outline">
                                 <AlertCircle className="h-3 w-3 mr-1" />
-                                Pending
+                                En attente
                               </Badge>
                             )}
                           </div>
@@ -542,7 +542,7 @@ export default function AdminDashboard() {
                               className="bg-green-600 hover:bg-green-700"
                             >
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              Approve
+                              Approuver
                             </Button>
                             <Button 
                               size="sm" 
@@ -551,7 +551,7 @@ export default function AdminDashboard() {
                               className="border-red-200 text-red-600 hover:bg-red-50"
                             >
                               <XCircle className="h-3 w-3 mr-1" />
-                              Deny
+                              Refuser
                             </Button>
                             <Button 
                               size="sm" 
@@ -560,7 +560,7 @@ export default function AdminDashboard() {
                               className="bg-red-600 hover:bg-red-700"
                             >
                               <Shield className="h-3 w-3 mr-1" />
-                              Close
+                              Fermer
                             </Button>
                           </div>
                         </div>
@@ -578,18 +578,18 @@ export default function AdminDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
-                Products Management
+                Gestion des produits
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Seller</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Produit</TableHead>
+                    <TableHead>Vendeur</TableHead>
+                    <TableHead>Catégorie</TableHead>
+                    <TableHead>Prix</TableHead>
+                    <TableHead>Statut</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -629,12 +629,12 @@ export default function AdminDashboard() {
                         {product.is_active ? (
                           <Badge variant="secondary" className="flex items-center gap-1 w-fit">
                             <CheckCircle className="h-3 w-3" />
-                            Active
+                            Actif
                           </Badge>
                         ) : (
                           <Badge variant="outline" className="flex items-center gap-1 w-fit">
                             <XCircle className="h-3 w-3" />
-                            Inactive
+                            Inactif
                           </Badge>
                         )}
                       </TableCell>
@@ -644,7 +644,7 @@ export default function AdminDashboard() {
                           variant="outline" 
                           onClick={() => toggleProductStatus(product.id, product.is_active || false)}
                         >
-                          {product.is_active ? 'Deactivate' : 'Activate'}
+                          {product.is_active ? 'Désactiver' : 'Activer'}
                         </Button>
                         <Button 
                           size="sm" 
@@ -668,19 +668,19 @@ export default function AdminDashboard() {
       <Dialog open={showAddProduct} onOpenChange={setShowAddProduct}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Add New Product</DialogTitle>
+            <DialogTitle>Ajouter un produit</DialogTitle>
             <DialogDescription>
-              Create a new product for the marketplace
+              Créer un nouveau produit pour le marché
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Product Title</Label>
+              <Label htmlFor="title">Titre du produit</Label>
               <Input 
                 id="title"
                 value={newProduct.title} 
                 onChange={(e) => setNewProduct({...newProduct, title: e.target.value})}
-                placeholder="Enter product title"
+                placeholder="Saisissez le titre du produit"
               />
             </div>
             <div className="space-y-2">
@@ -689,12 +689,12 @@ export default function AdminDashboard() {
                 id="description"
                 value={newProduct.description} 
                 onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
-                placeholder="Enter product description"
+                placeholder="Saisissez la description"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Price ($)</Label>
+                <Label htmlFor="price">Prix ($)</Label>
                 <Input 
                   id="price"
                   type="number" 
@@ -705,10 +705,10 @@ export default function AdminDashboard() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">Catégorie</Label>
                 <Select value={newProduct.category_id} onValueChange={(value) => setNewProduct({...newProduct, category_id: value})}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder="Sélectionnez une catégorie" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -721,21 +721,21 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="image">Image URL</Label>
+              <Label htmlFor="image">URL de l’image</Label>
               <Input 
                 id="image"
                 value={newProduct.image_url} 
                 onChange={(e) => setNewProduct({...newProduct, image_url: e.target.value})}
-                placeholder="https://example.com/image.jpg"
+                placeholder="https://exemple.com/image.jpg"
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddProduct(false)}>
-              Cancel
+              Annuler
             </Button>
             <Button onClick={handleAddProduct} disabled={saving}>
-              {saving ? 'Adding...' : 'Add Product'}
+              {saving ? 'Ajout…' : 'Ajouter le produit'}
             </Button>
           </DialogFooter>
         </DialogContent>

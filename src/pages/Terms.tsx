@@ -9,13 +9,13 @@ export default function Terms() {
       <div className="text-center space-y-4 py-8">
         <div className="flex items-center justify-center gap-3">
           <Scale className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold text-foreground">Terms of Service</h1>
+          <h1 className="text-4xl font-bold text-foreground">Conditions d’utilisation</h1>
         </div>
         <p className="text-muted-foreground text-lg">
-          Please read these terms carefully before using our services.
+          Veuillez lire attentivement ces conditions avant d’utiliser nos services.
         </p>
         <Badge variant="secondary" className="text-sm">
-          Last updated: January 2024
+          Dernière mise à jour : Janvier 2024
         </Badge>
       </div>
 
@@ -24,17 +24,17 @@ export default function Terms() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary" />
-            Agreement to Terms
+            Acceptation des conditions
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            These Terms of Service ("Terms") govern your use of the Luxury Haiti website and services. 
-            By accessing or using our services, you agree to be bound by these Terms.
+            Ces conditions d’utilisation régissent l’usage du site et des services Luxury Haiti.
+            En accédant à nos services, vous acceptez d’être lié par ces conditions.
           </p>
           <p className="text-muted-foreground">
-            If you do not agree to these Terms, please do not use our services. We reserve the right to 
-            modify these Terms at any time, and your continued use constitutes acceptance of any changes.
+            Si vous n’acceptez pas ces conditions, n’utilisez pas nos services. Nous nous réservons le droit
+            de modifier ces conditions à tout moment ; votre utilisation continue vaut acceptation des changements.
           </p>
         </CardContent>
       </Card>
@@ -44,30 +44,29 @@ export default function Terms() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />
-            Our Services
+            Nos services
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            Luxury Haiti is an online marketplace that connects buyers with sellers of authentic Haitian products. 
-            Our services include:
+            Luxury Haiti est une place de marché en ligne reliant acheteurs et vendeurs. Nos services incluent :
           </p>
           <ul className="space-y-2 text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Online marketplace platform for Haitian products</span>
+              <span>Plateforme de vente en ligne</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Seller verification and onboarding services</span>
+              <span>Vérification et intégration des vendeurs</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Payment processing and order management</span>
+              <span>Traitement des paiements et gestion des commandes</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Customer support and dispute resolution</span>
+              <span>Support client et gestion des litiges</span>
             </li>
           </ul>
         </CardContent>
@@ -78,28 +77,28 @@ export default function Terms() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />
-            User Accounts
+            Comptes utilisateurs
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h3 className="font-semibold text-foreground mb-3">Account Creation</h3>
+            <h3 className="font-semibold text-foreground mb-3">Création de compte</h3>
             <ul className="space-y-2 text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>You must provide accurate and complete information</span>
+                <span>Fournir des informations exactes et complètes</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>You are responsible for maintaining account security</span>
+                <span>Maintenir la sécurité de votre compte</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>You must be at least 18 years old to create an account</span>
+                <span>Avoir au moins 18 ans pour créer un compte</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>One account per person or business entity</span>
+                <span>Un compte par personne ou entité</span>
               </li>
             </ul>
           </div>
@@ -111,30 +110,29 @@ export default function Terms() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-primary" />
-            Prohibited Uses
+            Usages interdits
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            You may not use our services for any unlawful purpose or to solicit others to perform unlawful acts. 
-            Prohibited activities include:
+            Vous ne pouvez pas utiliser nos services à des fins illégales ni inciter à de tels actes. Les activités interdites incluent :
           </p>
           <ul className="space-y-2 text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Violating any applicable laws or regulations</span>
+              <span>Violation de lois ou réglementations en vigueur</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Transmitting harmful or malicious code</span>
+              <span>Transmission de code malveillant</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Attempting to gain unauthorized access to our systems</span>
+              <span>Accès non autorisé à nos systèmes</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Interfering with the proper functioning of our services</span>
+              <span>Perturbation du bon fonctionnement des services</span>
             </li>
           </ul>
         </CardContent>
@@ -145,13 +143,11 @@ export default function Terms() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-primary" />
-            Contact Information
+            Coordonnées
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            If you have any questions about these Terms of Service, please contact us:
-          </p>
+          <p className="text-muted-foreground">Pour toute question concernant ces conditions, contactez‑nous :</p>
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <Mail className="h-4 w-4 text-muted-foreground" />

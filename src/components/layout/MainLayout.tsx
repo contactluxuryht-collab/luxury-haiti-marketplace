@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Bell, LogOut, Shield } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigate } from "react-router-dom"
+import { useSettings } from "@/hooks/useSettings"
 
 interface MainLayoutProps {
   children: React.ReactNode
@@ -13,6 +14,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const { currency, setCurrency, t } = useSettings()
 
   const handleSignOut = async () => {
     await signOut()
@@ -30,12 +32,21 @@ export function MainLayout({ children }: MainLayoutProps) {
             <div className="flex items-center gap-4">
               <SidebarTrigger className="text-foreground hover:bg-accent hover:text-accent-foreground" />
               <div className="hidden md:block">
-                <h2 className="text-xl font-semibold text-foreground">Welcome to Luxury Haiti</h2>
-                <p className="text-sm text-muted-foreground">Discover premium products from Haiti</p>
+                <h2 className="text-xl font-semibold text-foreground">{t('welcome')}</h2>
+                <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-3">
+              {/* Currency Selector */}
+              <select
+                className="h-9 px-2 border border-border rounded-md bg-background text-sm"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as any)}
+              >
+                <option value="HTG">HTG</option>
+                <option value="USD">USD</option>
+              </select>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"></span>
@@ -61,11 +72,11 @@ export function MainLayout({ children }: MainLayoutProps) {
               ) : (
                 <div className="flex items-center gap-2">
                   <Button variant="outline" onClick={() => navigate("/auth")}>
-                    Sign In to Sell
+                    Se connecter pour vendre
                   </Button>
                   <Button variant="ghost" onClick={() => navigate("/admin/login")}>
                     <Shield className="h-4 w-4 mr-2" />
-                    Admin Login
+                    Connexion Admin
                   </Button>
                 </div>
               )}

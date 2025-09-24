@@ -13,7 +13,7 @@ export default function About() {
             About Luxury Haiti
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Discover the beauty of Haiti through our premium marketplace, connecting you with authentic Haitian products and supporting local artisans.
+            Discover quality products from Haiti and beyond—our marketplace offers a wide range for every need, with a strong focus on authentic Haitian goods and support for local artisans.
           </p>
         </div>
         <div className="flex justify-center">
@@ -35,8 +35,8 @@ export default function About() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-muted-foreground">
-              To create a premium marketplace that showcases the exceptional craftsmanship and cultural heritage of Haiti, 
-              while providing a seamless shopping experience for customers worldwide.
+              To create a premium marketplace that showcases exceptional products from Haiti and around the world—
+              with a special focus on Haitian craftsmanship and cultural heritage—while providing a seamless shopping experience for customers worldwide.
             </p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
@@ -90,7 +90,7 @@ export default function About() {
         <div className="text-center space-y-4">
           <h2 className="text-3xl font-bold text-foreground">What We Offer</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            From handcrafted jewelry to premium coffee, discover the finest products Haiti has to offer.
+            From handcrafted Haitian goods to global essentials, discover quality items with a strong emphasis on Haitian products.
           </p>
         </div>
 
@@ -104,7 +104,7 @@ export default function About() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-muted-foreground">
-                Curated selection of high-quality Haitian products including jewelry, textiles, coffee, and artisan crafts.
+                Curated selection of high-quality products—with an emphasis on Haitian jewelry, textiles, coffee, and artisan crafts.
               </p>
             </CardContent>
           </Card>
@@ -118,7 +118,7 @@ export default function About() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-muted-foreground">
-                All our sellers are carefully vetted to ensure authenticity and quality. We support local Haitian businesses and artisans.
+                All our sellers are carefully vetted to ensure authenticity and quality. We support local Haitian businesses and artisans while welcoming trusted global vendors.
               </p>
             </CardContent>
           </Card>

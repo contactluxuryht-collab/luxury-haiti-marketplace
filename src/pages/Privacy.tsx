@@ -9,13 +9,13 @@ export default function Privacy() {
       <div className="text-center space-y-4 py-8">
         <div className="flex items-center justify-center gap-3">
           <Shield className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold text-foreground">Privacy Policy</h1>
+          <h1 className="text-4xl font-bold text-foreground">Politique de confidentialité</h1>
         </div>
         <p className="text-muted-foreground text-lg">
-          Your privacy is important to us. Learn how we collect, use, and protect your information.
+          Votre vie privée est importante pour nous. Découvrez comment nous collectons, utilisons et protégeons vos informations.
         </p>
         <Badge variant="secondary" className="text-sm">
-          Last updated: January 2024
+          Dernière mise à jour : Janvier 2024
         </Badge>
       </div>
 
@@ -29,13 +29,12 @@ export default function Privacy() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            Luxury Haiti ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy 
-            explains how we collect, use, disclose, and safeguard your information when you use our website 
-            and services.
+            Luxury Haiti (« nous », « notre ») s’engage à protéger votre vie privée. Cette politique explique comment
+            nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous utilisez notre site et nos services.
           </p>
           <p className="text-muted-foreground">
-            By using our services, you agree to the collection and use of information in accordance with this policy. 
-            If you do not agree with our policies and practices, please do not use our services.
+            En utilisant nos services, vous acceptez la collecte et l’utilisation de vos informations conformément à cette politique.
+            Si vous n’êtes pas d’accord, veuillez ne pas utiliser nos services.
           </p>
         </CardContent>
       </Card>
@@ -45,50 +44,50 @@ export default function Privacy() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5 text-primary" />
-            Information We Collect
+            Informations que nous collectons
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="font-semibold text-foreground mb-3">Personal Information</h3>
+            <h3 className="font-semibold text-foreground mb-3">Informations personnelles</h3>
             <ul className="space-y-2 text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>Name, email address, and phone number</span>
+                <span>Nom, adresse e‑mail et numéro de téléphone</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>Billing and shipping addresses</span>
+                <span>Adresses de facturation et de livraison</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>Payment information (processed securely through third-party providers)</span>
+                <span>Informations de paiement (traitées en toute sécurité par des prestataires tiers)</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>Account preferences and settings</span>
+                <span>Préférences et paramètres de compte</span>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-3">Usage Information</h3>
+            <h3 className="font-semibold text-foreground mb-3">Informations d’utilisation</h3>
             <ul className="space-y-2 text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>Pages visited and time spent on our website</span>
+                <span>Pages visitées et temps passé sur le site</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>Products viewed and purchased</span>
+                <span>Produits consultés et achetés</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>Device information and browser type</span>
+                <span>Informations sur l’appareil et le navigateur</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
-                <span>IP address and location data</span>
+                <span>Adresse IP et données de localisation</span>
               </li>
             </ul>
           </div>
@@ -100,27 +99,27 @@ export default function Privacy() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />
-            How We Use Your Information
+            Comment nous utilisons vos informations
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-semibold text-foreground mb-3">Service Provision</h3>
+              <h3 className="font-semibold text-foreground mb-3">Fourniture de services</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Process orders and payments</li>
-                <li>• Provide customer support</li>
-                <li>• Manage your account</li>
-                <li>• Communicate about your orders</li>
+                <li>• Traiter les commandes et les paiements</li>
+                <li>• Assurer l’assistance client</li>
+                <li>• Gérer votre compte</li>
+                <li>• Communiquer au sujet de vos commandes</li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-foreground mb-3">Improvement & Marketing</h3>
+              <h3 className="font-semibold text-foreground mb-3">Amélioration et marketing</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Improve our services</li>
-                <li>• Send promotional emails (with consent)</li>
-                <li>• Analyze usage patterns</li>
-                <li>• Personalize your experience</li>
+                <li>• Améliorer nos services</li>
+                <li>• Envoyer des e‑mails promotionnels (avec consentement)</li>
+                <li>• Analyser les usages</li>
+                <li>• Personnaliser votre expérience</li>
               </ul>
             </div>
           </div>
@@ -132,30 +131,30 @@ export default function Privacy() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-primary" />
-            Data Security
+            Sécurité des données
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            We implement appropriate security measures to protect your personal information against unauthorized 
-            access, alteration, disclosure, or destruction. These measures include:
+            Nous mettons en place des mesures de sécurité appropriées pour protéger vos données contre l’accès non autorisé,
+            l’altération, la divulgation ou la destruction. Ces mesures incluent :
           </p>
           <ul className="space-y-2 text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>SSL encryption for data transmission</span>
+              <span>Chiffrement SSL pour la transmission</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Secure servers and databases</span>
+              <span>Serveurs et bases de données sécurisés</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Regular security audits and updates</span>
+              <span>Audits de sécurité et mises à jour réguliers</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Limited access to personal information</span>
+              <span>Accès limité aux informations personnelles</span>
             </li>
           </ul>
         </CardContent>
@@ -166,13 +165,11 @@ export default function Privacy() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-primary" />
-            Contact Us
+            Nous contacter
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            If you have any questions about this Privacy Policy or our data practices, please contact us:
-          </p>
+          <p className="text-muted-foreground">Pour toute question sur cette politique ou nos pratiques de données, contactez‑nous :</p>
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <Mail className="h-4 w-4 text-muted-foreground" />

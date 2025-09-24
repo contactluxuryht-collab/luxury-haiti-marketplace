@@ -18,13 +18,13 @@ export default function Wishlist() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Wishlist</h1>
-          <p className="text-muted-foreground">Your saved favorite products</p>
+          <h1 className="text-3xl font-bold text-foreground">Favoris</h1>
+          <p className="text-muted-foreground">Vos produits préférés enregistrés</p>
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading wishlist...</p>
+            <p className="text-muted-foreground">Chargement des favoris…</p>
           </div>
         </div>
       </div>
@@ -35,15 +35,15 @@ export default function Wishlist() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">My Wishlist</h1>
+          <h1 className="text-3xl font-bold text-foreground">Mes favoris</h1>
           <p className="text-muted-foreground">
-            {wishlist.length} item{wishlist.length !== 1 ? 's' : ''} saved
+            {wishlist.length} élément{wishlist.length !== 1 ? 's' : ''} enregistré{wishlist.length !== 1 ? 's' : ''}
           </p>
         </div>
         {wishlist.length > 0 && (
           <Button variant="outline" className="gap-2">
             <ShoppingBag className="h-4 w-4" />
-            Add All to Cart
+            Tout ajouter au panier
           </Button>
         )}
       </div>
@@ -51,14 +51,12 @@ export default function Wishlist() {
       {wishlist.length === 0 ? (
         <div className="flex items-center justify-center h-64 bg-gradient-card rounded-xl border border-border/50">
           <div className="text-center">
-            <h3 className="text-xl font-semibold mb-2">Your Wishlist is Empty</h3>
-            <p className="text-muted-foreground mb-4">
-              Start exploring products and save your favorites here
-            </p>
+            <h3 className="text-xl font-semibold mb-2">Votre liste de favoris est vide</h3>
+            <p className="text-muted-foreground mb-4">Commencez à explorer et enregistrez vos produits préférés ici</p>
             <Button asChild>
               <a href="/marketplace">
                 <ShoppingBag className="mr-2 h-4 w-4" />
-                Browse Products
+                Parcourir les produits
               </a>
             </Button>
           </div>
@@ -88,7 +86,7 @@ export default function Wishlist() {
                 onClick={() => handleRemoveFromWishlist(item.product.id)}
               >
                 <Trash2 className="h-3 w-3" />
-                Remove
+                Retirer
               </Button>
             </div>
           ))}

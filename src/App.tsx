@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { SettingsProvider } from "@/hooks/useSettings";
 import { AuthProvider } from "@/hooks/useAuth";
 import Home from "./pages/Home";
 import Marketplace from "./pages/Marketplace";
@@ -30,6 +31,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <SettingsProvider>
           <Routes>
             {/* Standalone auth page without layout */}
             <Route path="/auth" element={<Auth />} />
@@ -102,6 +104,7 @@ const App = () => (
               </MainLayout>
             } />
           </Routes>
+          </SettingsProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

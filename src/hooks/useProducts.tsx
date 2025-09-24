@@ -13,6 +13,7 @@ export interface Product {
   seller?: {
     name: string | null
     email: string
+    phone_number?: string | null
   }
   category?: {
     name: string
@@ -32,7 +33,7 @@ export function useProducts() {
         .from('products')
         .select(`
           *,
-          seller:users!products_seller_id_fkey(name, email),
+          seller:users!products_seller_id_fkey(name, email, phone_number),
           category:categories(name, description)
         `)
         .order('created_at', { ascending: false })

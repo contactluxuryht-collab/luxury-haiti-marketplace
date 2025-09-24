@@ -15,7 +15,8 @@
     "db:setup": "node scripts/apply-sql-client.mjs",
     "db:apply:users-policy": "node scripts/apply-sql.mjs supabase/users-public-policy.sql",
     "db:apply:seller-approval": "node scripts/apply-sql.mjs supabase/seller-approval.sql",
-    "create-admin": "node scripts/create-admin.mjs"
+    "create-admin": "node scripts/create-admin.mjs",
+    "storage:ensure": "node scripts/ensure-storage-bucket.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

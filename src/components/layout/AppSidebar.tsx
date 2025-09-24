@@ -17,18 +17,18 @@ import {
 } from "@/components/ui/sidebar"
 
 const navigationItems = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Marketplace", url: "/marketplace", icon: ShoppingBag },
-  { title: "Search", url: "/search", icon: Search },
-  { title: "Wishlist", url: "/wishlist", icon: Heart },
+  { title: "Accueil", url: "/", icon: Home },
+  { title: "Marché", url: "/marketplace", icon: ShoppingBag },
+  { title: "Recherche", url: "/search", icon: Search },
+  { title: "Favoris", url: "/wishlist", icon: Heart },
 ]
 
 const sellerItems = [
-  { title: "Seller Dashboard", url: "/seller", icon: Store },
+  { title: "Espace Vendeur", url: "/seller", icon: Store },
 ]
 
 const accountItems = [
-  { title: "Profile", url: "/profile", icon: User },
+  { title: "Profil", url: "/profile", icon: User },
 ]
 
 const adminItems = [
@@ -68,7 +68,7 @@ export function AppSidebar() {
                 <h1 className="text-lg font-bold bg-gradient-luxury bg-clip-text text-transparent">
                   Luxury Haiti
                 </h1>
-                <p className="text-xs text-sidebar-foreground/60">Premium Marketplace</p>
+                <p className="text-xs text-sidebar-foreground/60">Marché Premium</p>
               </div>
             )}
           </div>
@@ -77,7 +77,7 @@ export function AppSidebar() {
         {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
-            {!collapsed && "Browse"}
+            {!collapsed && "Parcourir"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -99,7 +99,7 @@ export function AppSidebar() {
         {user && role === 'seller' && (
           <SidebarGroup>
             <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
-              {!collapsed && "Sell"}
+            {!collapsed && "Vendre"}
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -122,7 +122,7 @@ export function AppSidebar() {
         {user && role === 'admin' && (
           <SidebarGroup>
             <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
-              {!collapsed && "Admin"}
+            {!collapsed && "Admin"}
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -144,7 +144,7 @@ export function AppSidebar() {
         {/* Account Section */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
-            {!collapsed && "Account"}
+            {!collapsed && "Compte"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -164,7 +164,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild className={menuButtonStaticCls}>
                     <NavLink to="/auth" className={getNavCls}>
                       <LogIn className="h-5 w-5" />
-                      {!collapsed && <span className="font-medium">Sign In to Sell</span>}
+                      {!collapsed && <span className="font-medium">Se connecter pour vendre</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

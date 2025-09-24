@@ -45,13 +45,13 @@ export default function Search() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Search</h1>
-          <p className="text-muted-foreground">Find exactly what you're looking for</p>
+          <h1 className="text-3xl font-bold text-foreground">Recherche</h1>
+          <p className="text-muted-foreground">Trouvez exactement ce que vous cherchez</p>
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading products...</p>
+            <p className="text-muted-foreground">Chargement des produits…</p>
           </div>
         </div>
       </div>
@@ -61,8 +61,8 @@ export default function Search() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Advanced Search</h1>
-        <p className="text-muted-foreground">Find exactly what you're looking for</p>
+        <h1 className="text-3xl font-bold text-foreground">Recherche avancée</h1>
+        <p className="text-muted-foreground">Trouvez exactement ce que vous cherchez</p>
       </div>
 
       {/* Search Bar */}
@@ -70,7 +70,7 @@ export default function Search() {
         <div className="flex-1 relative">
           <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
           <Input
-            placeholder="Search products, sellers, descriptions..."
+            placeholder="Rechercher des produits, vendeurs, descriptions…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 h-12"
@@ -78,7 +78,7 @@ export default function Search() {
         </div>
         <Button variant="outline" className="gap-2 h-12">
           <Filter className="h-4 w-4" />
-          Advanced Filters
+          Filtres avancés
         </Button>
       </div>
 
@@ -86,14 +86,14 @@ export default function Search() {
       <div className="space-y-4">
         {/* Categories */}
         <div>
-          <h3 className="text-sm font-medium text-foreground mb-2">Categories</h3>
+          <h3 className="text-sm font-medium text-foreground mb-2">Catégories</h3>
           <div className="flex gap-2 overflow-x-auto pb-2">
             <Button
               variant={selectedCategory === null ? "default" : "outline"}
               onClick={() => setSelectedCategory(null)}
               size="sm"
             >
-              All
+              Tous
             </Button>
             {categories.map((category) => (
               <Button
@@ -111,14 +111,14 @@ export default function Search() {
 
         {/* Price Ranges */}
         <div>
-          <h3 className="text-sm font-medium text-foreground mb-2">Price Range</h3>
+          <h3 className="text-sm font-medium text-foreground mb-2">Tranche de prix</h3>
           <div className="flex gap-2 overflow-x-auto pb-2">
             <Button
               variant={priceRange === null ? "default" : "outline"}
               onClick={() => setPriceRange(null)}
               size="sm"
             >
-              Any Price
+              Tout prix
             </Button>
             <Button
               variant={priceRange?.min === 0 && priceRange?.max === 50 ? "default" : "outline"}
@@ -126,7 +126,7 @@ export default function Search() {
               size="sm"
               className="whitespace-nowrap"
             >
-              Under $50
+              Moins de $50
             </Button>
             <Button
               variant={priceRange?.min === 50 && priceRange?.max === 200 ? "default" : "outline"}
@@ -150,7 +150,7 @@ export default function Search() {
               size="sm"
               className="whitespace-nowrap"
             >
-              Over $500
+              Plus de $500
             </Button>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function Search() {
       {/* Results */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+          {filteredProducts.length} produit{filteredProducts.length !== 1 ? 's' : ''} trouvé{filteredProducts.length !== 1 ? 's' : ''}
         </p>
       </div>
 
@@ -167,10 +167,8 @@ export default function Search() {
       {filteredProducts.length === 0 ? (
         <div className="flex items-center justify-center h-64 bg-gradient-card rounded-xl border border-border/50">
           <div className="text-center">
-            <h3 className="text-xl font-semibold mb-2">No Products Found</h3>
-            <p className="text-muted-foreground">
-              Try adjusting your search terms or filters
-            </p>
+            <h3 className="text-xl font-semibold mb-2">Aucun produit trouvé</h3>
+            <p className="text-muted-foreground">Essayez d’ajuster vos termes de recherche ou vos filtres</p>
           </div>
         </div>
       ) : (
@@ -185,7 +183,8 @@ export default function Search() {
               imageUrl={product.image_url || "/placeholder.svg"}
               seller={{
                 name: product.seller?.name || "Unknown Seller",
-                avatar: ""
+                avatar: "",
+                phoneNumber: product.seller?.phone_number || null
               }}
               onAddToWishlist={handleAddToWishlist}
               onViewProduct={handleViewProduct}
