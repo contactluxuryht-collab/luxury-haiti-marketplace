@@ -124,7 +124,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (products) {
-      setAllProducts(products as ProductRow[])
+      const productsWithActive = products.map(p => ({ 
+        ...p, 
+        is_active: true // Default to active since the Product type doesn't include this field yet
+      }))
+      setAllProducts(productsWithActive)
     }
   }, [products])
 
@@ -132,7 +136,7 @@ export default function AdminDashboard() {
     // Users
     const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true })
     const { count: sellersCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'seller')
-    const { data: pendingData } = await supabase.from('users').select('id, seller_approved').eq('role', 'seller')
+    const { data: pendingData } = await supabase.from('users').select('id, email, name, role, business_name').eq('role', 'seller')
     const pending = (pendingData || []).filter((r: any) => !r.seller_approved).length
     // Products
     const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true })
@@ -178,7 +182,7 @@ export default function AdminDashboard() {
         setSellers([])
       } else {
         console.log('Fetched sellers:', data)
-        setSellers(data as SellerRow[])
+        setSellers(data || [])
       }
     } catch (err: any) {
       console.error('Fetch sellers error:', err)
