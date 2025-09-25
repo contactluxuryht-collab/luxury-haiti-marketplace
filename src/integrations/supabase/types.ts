@@ -94,13 +94,13 @@ export type Database = {
           notes: string | null
           payment_method: string | null
           payment_status: string | null
-          price_per_unit: number | null
+          price_per_unit: number
           product_id: string
-          quantity: number | null
+          quantity: number
           seller_id: string | null
           shipping_address: Json | null
           status: string | null
-          total_amount: number | null
+          total_amount: number
           updated_at: string | null
         }
         Insert: {
@@ -110,13 +110,13 @@ export type Database = {
           notes?: string | null
           payment_method?: string | null
           payment_status?: string | null
-          price_per_unit?: number | null
+          price_per_unit?: number
           product_id: string
-          quantity?: number | null
+          quantity?: number
           seller_id?: string | null
           shipping_address?: Json | null
           status?: string | null
-          total_amount?: number | null
+          total_amount?: number
           updated_at?: string | null
         }
         Update: {
@@ -126,13 +126,13 @@ export type Database = {
           notes?: string | null
           payment_method?: string | null
           payment_status?: string | null
-          price_per_unit?: number | null
+          price_per_unit?: number
           product_id?: string
-          quantity?: number | null
+          quantity?: number
           seller_id?: string | null
           shipping_address?: Json | null
           status?: string | null
-          total_amount?: number | null
+          total_amount?: number
           updated_at?: string | null
         }
         Relationships: [
@@ -148,13 +148,6 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -303,24 +296,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "reviews_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "reviews_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -342,6 +321,7 @@ export type Database = {
           name: string | null
           phone_number: string | null
           role: string
+          seller_approved: boolean | null
           selling_focus: string | null
           updated_at: string | null
         }
@@ -354,6 +334,7 @@ export type Database = {
           name?: string | null
           phone_number?: string | null
           role?: string
+          seller_approved?: boolean | null
           selling_focus?: string | null
           updated_at?: string | null
         }
@@ -366,6 +347,7 @@ export type Database = {
           name?: string | null
           phone_number?: string | null
           role?: string
+          seller_approved?: boolean | null
           selling_focus?: string | null
           updated_at?: string | null
         }
@@ -412,7 +394,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_seller_approved: {
+        Args: { seller_auth_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
