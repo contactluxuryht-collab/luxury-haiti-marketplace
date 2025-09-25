@@ -22,7 +22,7 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       {/* Hero Section */}
       <section className="relative overflow-hidden rounded-2xl bg-gradient-luxury">
         <div className="absolute inset-0">
@@ -33,18 +33,18 @@ export default function Home() {
           />
         </div>
         
-        <div className="relative px-8 py-16 md:py-24">
+        <div className="relative px-4 md:px-8 py-12 md:py-24">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+            <h1 className="text-3xl md:text-6xl font-bold text-white mb-4 md:mb-6 leading-tight drop-shadow-lg">
               Découvrez 
               <span className="block text-white">
                 Luxury Haiti
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed drop-shadow-md">
+            <p className="text-base md:text-xl text-white/90 mb-6 md:mb-8 leading-relaxed drop-shadow-md">
               Un marché moderne où vous trouvez tout : mode, électronique, maison et plus encore—with un accent fort sur les produits haïtiens.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button variant="hero" size="hero" className="shadow-elevated bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => window.location.assign('/marketplace')}>
             <TrendingUp className="mr-2 h-5 w-5" />
             Voir le Marché
@@ -59,7 +59,7 @@ export default function Home() {
 
       {/* AliExpress-style Search Bar */}
       <section className="space-y-6">
-        <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+        <div className="flex flex-col lg:flex-row gap-3 md:gap-4 items-stretch">
           {/* All Categories Button */}
           <div className="lg:w-48">
             <Button 
@@ -75,16 +75,16 @@ export default function Home() {
           </div>
           
           {/* Search Bar */}
-          <div className="flex-1 flex gap-4">
+          <div className="flex-1 flex gap-3 md:gap-4">
             <div className="relative flex-1">
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
               <Input
                 placeholder="Rechercher des produits, marques et plus…"
-                className="pl-10 h-12 bg-background border-border text-foreground placeholder:text-muted-foreground"
+                className="pl-10 h-11 md:h-12 bg-background border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             
-            <Button variant="default" className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button variant="default" className="h-11 md:h-12 px-6 md:px-8 bg-primary text-primary-foreground hover:bg-primary/90">
               Rechercher
             </Button>
           </div>
@@ -126,7 +126,7 @@ export default function Home() {
           <Button variant="luxury" onClick={() => window.location.assign('/marketplace')}>Tout voir</Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {(loading ? [] : featured).map((product) => (
             <ProductCard
               key={product.id}
@@ -157,7 +157,7 @@ export default function Home() {
           <Button variant="luxury" onClick={() => window.location.assign('/marketplace')}>Tout voir</Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {(loading ? [] : best).map((product) => (
             <ProductCard
               key={`best-${product.id}`}
