@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from 'react'
 
-type SupportedLanguage = 'fr'
+type SupportedLanguage = 'fr' | 'en'
 type SupportedCurrency = 'HTG' | 'USD'
 
 type SettingsContextType = {
