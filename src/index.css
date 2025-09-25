@@ -132,8 +132,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased overflow-x-hidden;
   }
+  html { overflow-x: hidden; }
+  #root { overflow-x: hidden; }
+  img, video { max-width: 100%; height: auto; }
   
   .line-clamp-1 {
     overflow: hidden;
