@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose } from "@/components/ui/drawer"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
@@ -694,213 +695,233 @@ Détails du produit:
           )}
         </CardContent>
       </Card>
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Ajouter un nouveau produit</DialogTitle>
-            <DialogDescription>Entrez tous les détails de votre produit.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="prod-title">Titre du produit *</Label>
-              <Input id="prod-title" value={newProduct.title} onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })} placeholder="Saisissez le titre du produit" />
-            </div>
+      <Drawer open={addOpen} onOpenChange={setAddOpen}>
+        <DrawerContent className="h-[90vh]">
+          <div className="flex flex-col h-full">
+            <DrawerHeader className="flex-shrink-0">
+              <DrawerTitle>Ajouter un nouveau produit</DrawerTitle>
+              <DrawerDescription>Entrez tous les détails de votre produit.</DrawerDescription>
+            </DrawerHeader>
             
-            <div className="space-y-2">
-              <Label htmlFor="prod-desc">Description</Label>
-              <Textarea id="prod-desc" value={newProduct.description} onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} placeholder="Décrivez votre produit…" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="prod-price">Prix *</Label>
-                <Input id="prod-price" type="number" step="0.01" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} placeholder="0.00" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="prod-category">Catégorie *</Label>
-                <Select value={newProduct.category_id} onValueChange={(value) => setNewProduct({ ...newProduct, category_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez une catégorie" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="prod-quantity">Quantité disponible</Label>
-              <Input id="prod-quantity" type="number" value={newProduct.quantity} onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })} placeholder="Combien en stock ?" />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Couleurs disponibles</Label>
-              <div className="space-y-2">
-                <div className="flex gap-2">
-                  <Input 
-                    value={newColor} 
-                    onChange={(e) => setNewColor(e.target.value)} 
-                    placeholder="ex. Rouge, Bleu, Noir" 
-                    onKeyPress={(e) => e.key === 'Enter' && addColor()}
-                  />
-                  <Button type="button" onClick={addColor} disabled={!newColor.trim()}>
-                    Ajouter une couleur
-                  </Button>
+            <div className="flex-1 overflow-y-auto px-4 pb-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="prod-title">Titre du produit *</Label>
+                  <Input id="prod-title" value={newProduct.title} onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })} placeholder="Saisissez le titre du produit" />
                 </div>
-                {newProduct.colors.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {newProduct.colors.map((color, index) => (
-                      <div key={index} className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-md">
-                        <span className="text-sm">{color}</span>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="prod-desc">Description</Label>
+                  <Textarea id="prod-desc" value={newProduct.description} onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} placeholder="Décrivez votre produit…" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-price">Prix *</Label>
+                    <Input id="prod-price" type="number" step="0.01" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} placeholder="0.00" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-category">Catégorie *</Label>
+                    <Select value={newProduct.category_id} onValueChange={(value) => setNewProduct({ ...newProduct, category_id: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez une catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="prod-quantity">Quantité disponible</Label>
+                  <Input id="prod-quantity" type="number" value={newProduct.quantity} onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })} placeholder="Combien en stock ?" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Couleurs disponibles</Label>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Input 
+                        value={newColor} 
+                        onChange={(e) => setNewColor(e.target.value)} 
+                        placeholder="ex. Rouge, Bleu, Noir" 
+                        onKeyPress={(e) => e.key === 'Enter' && addColor()}
+                      />
+                      <Button type="button" onClick={addColor} disabled={!newColor.trim()}>
+                        Ajouter une couleur
+                      </Button>
+                    </div>
+                    {newProduct.colors.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {newProduct.colors.map((color, index) => (
+                          <div key={index} className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-md">
+                            <span className="text-sm">{color}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-4 w-4 text-primary hover:text-destructive"
+                              onClick={() => removeColor(color)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-size">Taille</Label>
+                    <Input id="prod-size" value={newProduct.size} onChange={(e) => setNewProduct({ ...newProduct, size: e.target.value })} placeholder="ex. S, M, L" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-weight">Poids (lbs)</Label>
+                    <Input id="prod-weight" type="number" step="0.1" value={newProduct.weight} onChange={(e) => setNewProduct({ ...newProduct, weight: e.target.value })} placeholder="0.0" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Images du produit</Label>
+                  <div className="space-y-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileSelect}
+                      className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                    />
+                    {previewUrls.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {previewUrls.map((url, idx) => (
+                          <div key={idx} className="relative w-24 h-24 border border-border rounded-lg overflow-hidden">
+                            <img src={url} alt={`Prévisualisation ${idx+1}`} className="w-full h-full object-cover" />
+                          </div>
+                        ))}
                         <Button
                           type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-4 w-4 text-primary hover:text-destructive"
-                          onClick={() => removeColor(color)}
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedFiles([])
+                            setPreviewUrls([])
+                          }}
                         >
-                          <X className="h-3 w-3" />
+                          Effacer les images
                         </Button>
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
+                  <p className="text-xs text-muted-foreground">Vous pouvez aussi fournir une URL d'image ci‑dessous (utilisée si aucun fichier n'est sélectionné)</p>
+                  <Input 
+                    placeholder="https://exemple.com/image.jpg" 
+                    value={newProduct.image_url} 
+                    onChange={(e) => setNewProduct({ ...newProduct, image_url: e.target.value })} 
+                  />
+                </div>
+
+                {formError && <p className="text-sm text-destructive">{formError}</p>}
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="prod-size">Taille</Label>
-                <Input id="prod-size" value={newProduct.size} onChange={(e) => setNewProduct({ ...newProduct, size: e.target.value })} placeholder="ex. S, M, L" />
+            
+            <DrawerFooter className="flex-shrink-0 border-t">
+              <div className="flex gap-2 w-full">
+                <Button variant="outline" onClick={() => setAddOpen(false)} className="flex-1">
+                  Annuler
+                </Button>
+                <Button onClick={handleSaveProduct} disabled={saving || uploading} className="flex-1">
+                  {saving ? (uploading ? 'Téléversement…' : 'Enregistrement…') : 'Enregistrer le produit'}
+                </Button>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="prod-weight">Poids (lbs)</Label>
-                <Input id="prod-weight" type="number" step="0.1" value={newProduct.weight} onChange={(e) => setNewProduct({ ...newProduct, weight: e.target.value })} placeholder="0.0" />
-              </div>
-            </div>
+            </DrawerFooter>
+          </div>
+        </DrawerContent>
+      </Drawer>
 
-            <div className="space-y-2">
-              <Label>Images du produit</Label>
-              <div className="space-y-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleFileSelect}
-                  className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                />
-                {previewUrls.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {previewUrls.map((url, idx) => (
-                      <div key={idx} className="relative w-24 h-24 border border-border rounded-lg overflow-hidden">
-                        <img src={url} alt={`Prévisualisation ${idx+1}`} className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedFiles([])
-                        setPreviewUrls([])
+      {/* Edit Product Drawer */}
+      <Drawer open={editOpen} onOpenChange={setEditOpen}>
+        <DrawerContent className="h-[80vh]">
+          <div className="flex flex-col h-full">
+            <DrawerHeader className="flex-shrink-0">
+              <DrawerTitle>Modifier le produit</DrawerTitle>
+              <DrawerDescription>Mettez à jour les informations du produit.</DrawerDescription>
+            </DrawerHeader>
+            
+            <div className="flex-1 overflow-y-auto px-4 pb-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-title">Titre du produit *</Label>
+                  <Input id="edit-title" value={editProduct.title} onChange={(e) => setEditProduct({ ...editProduct, title: e.target.value })} placeholder="Saisissez le titre du produit" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-desc">Description</Label>
+                  <Textarea id="edit-desc" value={editProduct.description} onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })} placeholder="Décrivez votre produit…" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-price">Prix *</Label>
+                    <Input id="edit-price" type="number" step="0.01" value={editProduct.price} onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })} placeholder="0.00" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-category">Catégorie *</Label>
+                    <Select value={editProduct.category_id} onValueChange={(value) => setEditProduct({ ...editProduct, category_id: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez une catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Image principale</Label>
+                  <div className="space-y-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null
+                        setEditSelectedFile(file)
+                        setEditPreviewUrl(file ? URL.createObjectURL(file) : editProduct.image_url || null)
                       }}
-                    >
-                      Effacer les images
-                    </Button>
+                      className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                    />
+                    {editPreviewUrl && (
+                      <div className="relative w-32 h-32 border border-border rounded-lg overflow-hidden">
+                        <img src={editPreviewUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+                {formError && <p className="text-sm text-destructive">{formError}</p>}
               </div>
-              <p className="text-xs text-muted-foreground">Vous pouvez aussi fournir une URL d’image ci‑dessous (utilisée si aucun fichier n’est sélectionné)</p>
-              <Input 
-                placeholder="https://exemple.com/image.jpg" 
-                value={newProduct.image_url} 
-                onChange={(e) => setNewProduct({ ...newProduct, image_url: e.target.value })} 
-              />
             </div>
-
-            {formError && <p className="text-sm text-destructive">{formError}</p>}
+            
+            <DrawerFooter className="flex-shrink-0 border-t">
+              <div className="flex gap-2 w-full">
+                <Button variant="outline" onClick={() => setEditOpen(false)} className="flex-1">
+                  Annuler
+                </Button>
+                <Button onClick={handleUpdateProduct} disabled={saving || uploading} className="flex-1">
+                  {saving ? 'Enregistrement…' : 'Enregistrer les modifications'}
+                </Button>
+              </div>
+            </DrawerFooter>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Annuler</Button>
-            <Button onClick={handleSaveProduct} disabled={saving || uploading}>
-              {saving ? (uploading ? 'Téléversement…' : 'Enregistrement…') : 'Enregistrer le produit'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Product Dialog */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Modifier le produit</DialogTitle>
-            <DialogDescription>Mettez à jour les informations du produit.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-title">Titre du produit *</Label>
-              <Input id="edit-title" value={editProduct.title} onChange={(e) => setEditProduct({ ...editProduct, title: e.target.value })} placeholder="Saisissez le titre du produit" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-desc">Description</Label>
-              <Textarea id="edit-desc" value={editProduct.description} onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })} placeholder="Décrivez votre produit…" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-price">Prix *</Label>
-                <Input id="edit-price" type="number" step="0.01" value={editProduct.price} onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })} placeholder="0.00" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-category">Catégorie *</Label>
-                <Select value={editProduct.category_id} onValueChange={(value) => setEditProduct({ ...editProduct, category_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez une catégorie" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Image principale</Label>
-              <div className="space-y-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null
-                    setEditSelectedFile(file)
-                    setEditPreviewUrl(file ? URL.createObjectURL(file) : editProduct.image_url || null)
-                  }}
-                  className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                />
-                {editPreviewUrl && (
-                  <div className="relative w-32 h-32 border border-border rounded-lg overflow-hidden">
-                    <img src={editPreviewUrl} alt="Aperçu" className="w-full h-full object-cover" />
-                  </div>
-                )}
-              </div>
-            </div>
-            {formError && <p className="text-sm text-destructive">{formError}</p>}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Annuler</Button>
-            <Button onClick={handleUpdateProduct} disabled={saving || uploading}>
-              {saving ? 'Enregistrement…' : 'Enregistrer les modifications'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </DrawerContent>
+      </Drawer>
     </div>
   )
 }
