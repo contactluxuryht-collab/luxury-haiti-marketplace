@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Home, ShoppingBag, Store, User, Search, Heart, LogIn } from "lucide-react"
+import { Home, ShoppingBag, Store, User, Search, Heart, LogIn, Menu, Smartphone, Laptop, Headphones, Gamepad2 } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -21,6 +21,15 @@ const navigationItems = [
   { title: "Marché", url: "/marketplace", icon: ShoppingBag },
   { title: "Recherche", url: "/search", icon: Search },
   { title: "Favoris", url: "/wishlist", icon: Heart },
+]
+
+const categoryItems = [
+  { title: "Toutes les catégories", url: "/marketplace", icon: Menu },
+  { title: "Électronique", url: "/marketplace?category=electronics", icon: Smartphone },
+  { title: "Téléphones", url: "/marketplace?category=phones", icon: Smartphone },
+  { title: "Ordinateurs", url: "/marketplace?category=computers", icon: Laptop },
+  { title: "Audio & Casques", url: "/marketplace?category=audio", icon: Headphones },
+  { title: "Jeux", url: "/marketplace?category=games", icon: Gamepad2 },
 ]
 
 const sellerItems = [
@@ -85,6 +94,27 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className={menuButtonStaticCls}>
                     <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className="h-5 w-5" />
+                      {!collapsed && <span className="font-medium">{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Categories Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
+            {!collapsed && "Catégories"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {categoryItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className={menuButtonStaticCls}>
+                    <NavLink to={item.url} className={getNavCls}>
                       <item.icon className="h-5 w-5" />
                       {!collapsed && <span className="font-medium">{item.title}</span>}
                     </NavLink>
