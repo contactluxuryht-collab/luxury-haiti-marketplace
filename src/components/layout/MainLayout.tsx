@@ -75,8 +75,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 </Sheet>
               </div>
               <div>
-                <h2 className="text-lg md:text-xl font-semibold text-foreground">{t('welcome')}</h2>
-                <p className="hidden md:block text-sm text-muted-foreground">{t('subtitle')}</p>
+                <h2 className="text-sm md:text-xl font-semibold text-foreground">{t('welcome')}</h2>
               </div>
             </div>
             
@@ -115,7 +114,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               ) : (
                 <div className="flex items-center gap-2">
                   <Button variant="outline" onClick={() => navigate("/auth")}>
-                    Se connecter pour vendre
+                    Connect
                   </Button>
                   <Button variant="ghost" onClick={() => navigate("/admin/login")}>
                     <Shield className="h-4 w-4 mr-2" />
