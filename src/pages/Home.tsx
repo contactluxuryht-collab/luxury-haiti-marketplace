@@ -46,13 +46,10 @@ export default function Home() {
         </div>
         
         <div className="relative px-4 md:px-8 py-12 md:py-24">
-          <div className="max-w-2xl">
-            <h1 className="text-3xl md:text-6xl font-bold text-white mb-4 md:mb-6 leading-tight drop-shadow-lg">
-              Découvrez 
-              <span className="block text-white">
-                Luxury Haiti
-              </span>
-            </h1>
+            <div className="max-w-2xl">
+              <h1 className="text-3xl md:text-6xl font-bold text-white mb-4 md:mb-6 leading-tight drop-shadow-lg whitespace-nowrap">
+                Découvrez Luxury Haiti
+              </h1>
             <p className="text-base md:text-xl text-white/90 mb-6 md:mb-8 leading-relaxed drop-shadow-md">
               Un marché moderne où vous trouvez tout : mode, électronique, maison et plus encore—with un accent fort sur les produits haïtiens.
             </p>
