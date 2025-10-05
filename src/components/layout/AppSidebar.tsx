@@ -49,7 +49,7 @@ export function AppSidebar() {
   const { categories } = useCategories()
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 rounded-full px-4 py-3 font-medium transition-all duration-200 ${
+    `flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-all duration-200 ${
       isActive 
         ? "bg-primary text-primary-foreground shadow-md" 
         : "bg-primary/90 text-primary-foreground hover:bg-primary hover:shadow-md"

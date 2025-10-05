@@ -21,6 +21,14 @@ export default function Home() {
     window.location.assign(`/product/${id}`)
   }
 
+  const handleSearch = () => {
+    window.location.assign('/search')
+  }
+
+  const handleCategoryClick = (category: string) => {
+    window.location.assign(`/marketplace?category=${category}`)
+  }
+
   return (
     <div className="space-y-6 md:space-y-8">
       {/* Hero Section */}
@@ -84,7 +92,7 @@ export default function Home() {
               />
             </div>
             
-            <Button variant="default" className="h-11 md:h-12 px-6 md:px-8 bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button variant="default" className="h-11 md:h-12 px-6 md:px-8 bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleSearch}>
               Rechercher
             </Button>
           </div>
@@ -109,6 +117,7 @@ export default function Home() {
                   : "border-transparent text-muted-foreground hover:text-foreground hover:bg-transparent"
               }`}
               size="sm"
+              onClick={() => handleCategoryClick(category)}
             >
               {category}
             </Button>
