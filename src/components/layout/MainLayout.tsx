@@ -99,7 +99,7 @@ export function MainLayout({
                   <Button variant="ghost" size="icon" onClick={handleSignOut}>
                     <LogOut className="h-4 w-4" />
                   </Button>
-                </div> : <Button variant="outline" onClick={() => navigate("/auth")}>connecter pour vendre</Button>}
+                </div> : <Button variant="outline" onClick={() => navigate("/auth")}>vendre</Button>}
             </div>
           </header>
 
