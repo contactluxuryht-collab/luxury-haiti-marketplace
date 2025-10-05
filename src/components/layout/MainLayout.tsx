@@ -1,29 +1,33 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "./AppSidebar"
-import { Footer } from "./Footer"
-import { Button } from "@/components/ui/button"
-import { Bell, Home, LogOut, Search, Shield, ShoppingBag, Heart, User, Menu } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
-import { NavLink, useNavigate } from "react-router-dom"
-import { useSettings } from "@/hooks/useSettings"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "./AppSidebar";
+import { Footer } from "./Footer";
+import { Button } from "@/components/ui/button";
+import { Bell, Home, LogOut, Search, Shield, ShoppingBag, Heart, User, Menu } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useSettings } from "@/hooks/useSettings";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 interface MainLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
-
-export function MainLayout({ children }: MainLayoutProps) {
-  const { user, signOut } = useAuth()
-  const navigate = useNavigate()
-  const { currency, setCurrency, t } = useSettings()
-
+export function MainLayout({
+  children
+}: MainLayoutProps) {
+  const {
+    user,
+    signOut
+  } = useAuth();
+  const navigate = useNavigate();
+  const {
+    currency,
+    setCurrency,
+    t
+  } = useSettings();
   const handleSignOut = async () => {
-    await signOut()
-    navigate("/")
-  }
-
-  return (
-    <SidebarProvider>
+    await signOut();
+    navigate("/");
+  };
+  return <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background max-w-[100vw] overflow-x-hidden">
         {/* Desktop sidebar */}
         <div className="hidden md:block">
@@ -64,9 +68,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                       <MobileNavLink to="/search" icon={Search} label="Recherche" />
                       <MobileNavLink to="/wishlist" icon={Heart} label="Favoris" />
                       <MobileNavLink to="/profile" icon={User} label="Profil" />
-                      {(user?.user_metadata as any)?.role === 'seller' && (
-                        <MobileNavLink to="/seller" icon={ShoppingBag} label="Espace Vendeur" />
-                      )}
+                      {(user?.user_metadata as any)?.role === 'seller' && <MobileNavLink to="/seller" icon={ShoppingBag} label="Espace Vendeur" />}
                     </nav>
                   </SheetContent>
                 </Sheet>
@@ -79,11 +81,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             
             <div className="flex items-center gap-3">
               {/* Currency Selector */}
-              <select
-                className="h-9 px-2 border border-border rounded-md bg-background text-sm"
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as any)}
-              >
+              <select className="h-9 px-2 border border-border rounded-md bg-background text-sm" value={currency} onChange={e => setCurrency(e.target.value as any)}>
                 <option value="HTG">HTG</option>
                 <option value="USD">USD</option>
               </select>
@@ -92,8 +90,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"></span>
               </Button>
               
-              {user ? (
-                <div className="flex items-center gap-2">
+              {user ? <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
                     <span className="text-primary-foreground text-sm font-semibold">
                       {user.email?.charAt(0).toUpperCase()}
@@ -102,12 +99,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                   <Button variant="ghost" size="icon" onClick={handleSignOut}>
                     <LogOut className="h-4 w-4" />
                   </Button>
-                </div>
-              ) : (
-                <Button variant="outline" onClick={() => navigate("/auth")}>
-                  Se connecter pour vendre
-                </Button>
-              )}
+                </div> : <Button variant="outline" onClick={() => navigate("/auth")}>connecter pour vendre</Button>}
             </div>
           </header>
 
@@ -131,34 +123,37 @@ export function MainLayout({ children }: MainLayoutProps) {
           </nav>
         </div>
       </div>
-    </SidebarProvider>
-  )
+    </SidebarProvider>;
 }
-
-function MobileNavLink({ to, icon: Icon, label }: { to: string; icon: any; label: string }) {
-  return (
-    <NavLink
-      to={to}
-      className={({ isActive }) =>
-        `flex items-center gap-3 px-4 py-3 text-sm ${isActive ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50'}`
-      }
-    >
+function MobileNavLink({
+  to,
+  icon: Icon,
+  label
+}: {
+  to: string;
+  icon: any;
+  label: string;
+}) {
+  return <NavLink to={to} className={({
+    isActive
+  }) => `flex items-center gap-3 px-4 py-3 text-sm ${isActive ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50'}`}>
       <Icon className="h-5 w-5" />
       <span>{label}</span>
-    </NavLink>
-  )
+    </NavLink>;
 }
-
-function BottomNavLink({ to, icon: Icon, label }: { to: string; icon: any; label: string }) {
-  return (
-    <NavLink
-      to={to}
-      className={({ isActive }) =>
-        `flex flex-col items-center justify-center text-xs ${isActive ? 'text-primary' : 'text-muted-foreground'}`
-      }
-    >
+function BottomNavLink({
+  to,
+  icon: Icon,
+  label
+}: {
+  to: string;
+  icon: any;
+  label: string;
+}) {
+  return <NavLink to={to} className={({
+    isActive
+  }) => `flex flex-col items-center justify-center text-xs ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
       <Icon className="h-5 w-5 mb-0.5" />
       <span>{label}</span>
-    </NavLink>
-  )
+    </NavLink>;
 }
