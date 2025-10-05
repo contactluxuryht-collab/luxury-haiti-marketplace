@@ -31,79 +31,77 @@ export function ProductCard({
   isInWishlist = false,
 }: ProductCardProps) {
   const { formatPrice } = useSettings()
-  const waLink = seller.phoneNumber
-    ? `https://wa.me/${seller.phoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
-        `Hi ${seller.name}, I'm interested in your product: ${title} (ID: ${id}).`
-      )}`
-    : null
+  const originalPrice = price * 1.2 // Mock original price (20% higher)
+  const rating = 4.6 + Math.random() * 0.5 // Mock rating between 4.6-5.1
+  const soldCount = Math.floor(Math.random() * 10) * 1000 + Math.floor(Math.random() * 1000) // Mock sold count
+  
   return (
-    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-elevated hover:scale-105 bg-gradient-card backdrop-blur-sm border-border/50">
-      <div className="relative overflow-hidden">
+    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg bg-background border border-border">
+      <div className="relative overflow-hidden bg-muted/30">
         <img
           src={imageUrl}
           alt={title}
-          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <Button
           variant="ghost"
           size="icon"
-          className={`absolute top-3 right-3 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 ${
+          className={`absolute top-2 right-2 backdrop-blur-sm bg-background/80 hover:bg-background ${
             isInWishlist 
-              ? "bg-red-500/20 hover:bg-red-500/30 text-red-500" 
-              : "bg-white/20 hover:bg-white/30 text-white"
+              ? "text-red-500" 
+              : "text-muted-foreground hover:text-red-500"
           }`}
           onClick={() => onAddToWishlist?.(id)}
         >
           <Heart className={`h-4 w-4 ${isInWishlist ? "fill-current" : ""}`} />
         </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute bottom-2 right-2 bg-background/90 hover:bg-background shadow-md"
+          onClick={() => onViewProduct?.(id)}
+        >
+          <ShoppingCart className="h-5 w-5" />
+        </Button>
       </div>
       
-      <CardContent className="p-4">
-        <div className="space-y-2">
-          <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">
-            {title}
-          </h3>
-          <p className="text-muted-foreground text-sm line-clamp-2">
-            {description}
-          </p>
+      <CardContent className="p-3 space-y-2">
+        <h3 className="font-normal text-sm line-clamp-2 text-foreground min-h-[40px]">
+          {title}
+        </h3>
+        
+        <div className="space-y-1">
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold text-foreground">
+              {formatPrice(price)}
+            </span>
+            <span className="text-sm text-muted-foreground line-through">
+              {formatPrice(originalPrice)}
+            </span>
+          </div>
           
-          <div className="flex items-center justify-between pt-2">
-            <div>
-              <div className="text-2xl font-bold bg-gradient-luxury bg-clip-text text-transparent">
-                {formatPrice(price)}
+          <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-1">
+              <div className="flex text-yellow-500">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className={i < Math.floor(rating) ? "" : "opacity-30"}>★</span>
+                ))}
               </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <div className="w-5 h-5 bg-gradient-primary rounded-full flex items-center justify-center">
-                  <span className="text-primary-foreground text-xs font-semibold">
-                    {seller.name.charAt(0)}
-                  </span>
-                </div>
-                <span>{seller.name}</span>
-              </div>
+              <span className="text-foreground">{rating.toFixed(1)}</span>
             </div>
-            
-            <div className="flex items-center gap-2">
-              {waLink && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => window.open(waLink, '_blank')}
-                  className="opacity-0 group-hover:opacity-100 transition-all duration-300"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  WhatsApp
-                </Button>
-              )}
-              <Button
-                variant="luxury"
-                size="sm"
-                onClick={() => onViewProduct?.(id)}
-                className="opacity-0 group-hover:opacity-100 transition-all duration-300"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                View
-              </Button>
+            <span className="text-muted-foreground">|</span>
+            <span className="text-muted-foreground">{(soldCount/1000).toFixed(0)}k+ sold</span>
+          </div>
+
+          <div className="space-y-1 pt-1">
+            <div className="flex items-center gap-1 text-xs text-red-500">
+              <span>-</span>
+              <span className="font-medium">$2 off on $15</span>
+            </div>
+            <div className="flex items-center gap-1 text-xs text-primary">
+              <span>⚡</span>
+              <span>New shoppers save</span>
+              <span className="font-medium">${(price * 0.1).toFixed(2)}</span>
             </div>
           </div>
         </div>
