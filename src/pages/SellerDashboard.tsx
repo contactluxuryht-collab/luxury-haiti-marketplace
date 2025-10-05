@@ -42,6 +42,8 @@ export default function SellerDashboard() {
   const [newProduct, setNewProduct] = useState({
     title: "",
     description: "",
+    offer_amount: "",
+    offer_threshold: "",
     price: "",
     category_id: "",
     quantity: "",
@@ -66,6 +68,8 @@ export default function SellerDashboard() {
   const [editProduct, setEditProduct] = useState({
     title: "",
     description: "",
+    offer_amount: "",
+    offer_threshold: "",
     price: "",
     category_id: "",
     image_url: "",
@@ -259,6 +263,14 @@ export default function SellerDashboard() {
     setEditProduct({
       title: product.title || "",
       description: product.description || "",
+      offer_amount: (() => {
+        const m = (product.description || '').match(/\[OFFER\]:[^\n]*amount\s*=\s*([0-9]+(?:\.[0-9]+)?)/i)
+        return m ? m[1] : ""
+      })(),
+      offer_threshold: (() => {
+        const m = (product.description || '').match(/\[OFFER\]:[^\n]*threshold\s*=\s*([0-9]+(?:\.[0-9]+)?)/i)
+        return m ? m[1] : ""
+      })(),
       price: String(product.price ?? ""),
       category_id: product.category_id || "",
       image_url: product.image_url || "",
@@ -364,7 +376,10 @@ export default function SellerDashboard() {
       // Create detailed description with all product info
       const colorsText = newProduct.colors.length > 0 ? newProduct.colors.join(', ') : 'Non spécifié'
       const imagesSection = extraImageUrls.length > 0 ? `\n\nImages supplémentaires:\n${extraImageUrls.map(u => `- ${u}`).join('\n')}` : ''
-      const detailedDescription = `${newProduct.description}
+      const offerLine = newProduct.offer_amount && newProduct.offer_threshold
+        ? `\n[OFFER]: amount=${newProduct.offer_amount} threshold=${newProduct.offer_threshold}`
+        : ''
+      const detailedDescription = `${newProduct.description}${offerLine}
 
 Détails du produit:
 - Quantité disponible: ${quantityNumber || 'Non spécifié'}
@@ -372,7 +387,7 @@ Détails du produit:
 - Taille: ${newProduct.size || 'Non spécifiée'}
 - Poids: ${weightNumber ? `${weightNumber} lbs` : 'Non spécifié'}${imagesSection}`
 
-      const { error: insertError } = await supabase
+      const { data: inserted, error: insertError } = await supabase
         .from('products')
         .insert([
           {
@@ -388,8 +403,27 @@ Détails du produit:
             weight: isNaN(weightNumber) ? null : weightNumber,
           },
         ])
+        .select('id')
+        .single()
 
       if (insertError) throw insertError
+
+      // Create offer row if provided
+      if (newProduct.offer_amount && newProduct.offer_threshold && inserted?.id) {
+        const amountNum = parseFloat(newProduct.offer_amount as any)
+        const thresholdNum = parseFloat(newProduct.offer_threshold as any)
+        if (!isNaN(amountNum) && !isNaN(thresholdNum)) {
+          await supabase.from('offers').insert([
+            {
+              product_id: inserted.id,
+              seller_id: userData.id,
+              amount: amountNum,
+              threshold: thresholdNum,
+              active: true,
+            }
+          ])
+        }
+      }
 
       toast({ title: "Product added", description: "Your product is now listed." })
       setAddOpen(false)
@@ -423,11 +457,15 @@ Détails du produit:
         setUploading(false)
       }
 
+      const offerLineEdit = editProduct.offer_amount && editProduct.offer_threshold
+        ? `\n[OFFER]: amount=${editProduct.offer_amount} threshold=${editProduct.offer_threshold}`
+        : ''
+      const newDesc = `${editProduct.description}${offerLineEdit}`
       const { error } = await supabase
         .from('products')
         .update({
           title: editProduct.title,
-          description: editProduct.description,
+          description: newDesc,
           price: priceNumber,
           image_url: imageUrl || null,
           category_id: editProduct.category_id,
@@ -435,6 +473,38 @@ Détails du produit:
         .eq('id', editingProductId)
 
       if (error) throw error
+
+      // Upsert offer
+      if (editProduct.offer_amount && editProduct.offer_threshold) {
+        const amountNum = parseFloat(editProduct.offer_amount as any)
+        const thresholdNum = parseFloat(editProduct.offer_threshold as any)
+        if (!isNaN(amountNum) && !isNaN(thresholdNum)) {
+          // Resolve seller id again
+          const { data: userData2 } = await supabase
+            .from('users')
+            .select('id')
+            .eq('auth_id', user.id)
+            .single()
+          if (userData2) {
+            // If exists, update; else insert
+            const { data: existing } = await supabase
+              .from('offers')
+              .select('id')
+              .eq('product_id', editingProductId)
+              .limit(1)
+            if (existing && existing.length > 0) {
+              await supabase
+                .from('offers')
+                .update({ amount: amountNum, threshold: thresholdNum, active: true })
+                .eq('id', existing[0].id)
+            } else {
+              await supabase
+                .from('offers')
+                .insert([{ product_id: editingProductId, seller_id: userData2.id, amount: amountNum, threshold: thresholdNum, active: true }])
+            }
+          }
+        }
+      }
 
       toast({ title: "Produit mis à jour" })
       setEditOpen(false)
@@ -713,6 +783,18 @@ Détails du produit:
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
+                <Label htmlFor="offer-amount">Remise (montant)</Label>
+                <Input id="offer-amount" type="number" step="0.01" value={newProduct.offer_amount} onChange={(e) => setNewProduct({ ...newProduct, offer_amount: e.target.value })} placeholder="ex. 2" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="offer-threshold">Seuil d’achat</Label>
+                <Input id="offer-threshold" type="number" step="0.01" value={newProduct.offer_threshold} onChange={(e) => setNewProduct({ ...newProduct, offer_threshold: e.target.value })} placeholder="ex. 15" />
+              </div>
+              <p className="text-xs text-muted-foreground md:col-span-2">Astuce : Une ligne d’offre sera ajoutée dans la description pour affichage sur la fiche produit.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="prod-price">Prix *</Label>
                 <Input id="prod-price" type="number" step="0.01" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} placeholder="0.00" />
               </div>
@@ -849,6 +931,16 @@ Détails du produit:
             <div className="space-y-2">
               <Label htmlFor="edit-desc">Description</Label>
               <Textarea id="edit-desc" value={editProduct.description} onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })} placeholder="Décrivez votre produit…" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-offer-amount">Remise (montant)</Label>
+                <Input id="edit-offer-amount" type="number" step="0.01" value={editProduct.offer_amount} onChange={(e) => setEditProduct({ ...editProduct, offer_amount: e.target.value })} placeholder="ex. 2" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-offer-threshold">Seuil d’achat</Label>
+                <Input id="edit-offer-threshold" type="number" step="0.01" value={editProduct.offer_threshold} onChange={(e) => setEditProduct({ ...editProduct, offer_threshold: e.target.value })} placeholder="ex. 15" />
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">

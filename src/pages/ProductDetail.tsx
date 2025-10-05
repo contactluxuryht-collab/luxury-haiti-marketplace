@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { useWishlist } from "@/hooks/useWishlist"
 import { useCart } from "@/hooks/useCart"
 import { MessageCircle } from "lucide-react"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { useSettings } from "@/hooks/useSettings"
 
 type LoadedProduct = {
@@ -28,10 +29,13 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<LoadedProduct | null>(null)
   const [loading, setLoading] = useState(true)
   const [related, setRelated] = useState<LoadedProduct[]>([])
+  const [extraImages, setExtraImages] = useState<string[]>([])
   const [reviews, setReviews] = useState<Array<{ id: string; rating: number; comment: string | null; created_at: string | null; user: { name: string | null; email: string } }>>([])
   const [loadingReviews, setLoadingReviews] = useState<boolean>(true)
   const [newRating, setNewRating] = useState<number>(5)
   const [newComment, setNewComment] = useState<string>("")
+  const [soldCount, setSoldCount] = useState<number>(0)
+  const [activeOffer, setActiveOffer] = useState<{ amount: number; threshold: number } | null>(null)
   const { addToWishlist, isInWishlist } = useWishlist()
   const { addToCart } = useCart()
   const { formatPrice, t } = useSettings()
@@ -51,6 +55,54 @@ export default function ProductDetail() {
           .single()
         if (error) throw error
         setProduct(data as any)
+        // Prefer offers table; fallback to description tag
+        try {
+          const nowIso = new Date().toISOString()
+          const { data: offers } = await supabase
+            .from('offers')
+            .select('*')
+            .eq('product_id', id)
+            .eq('active', true)
+          const valid = (offers || []).filter((o: any) => {
+            const startsOk = !o.start_at || o.start_at <= nowIso
+            const endsOk = !o.end_at || o.end_at >= nowIso
+            return startsOk && endsOk
+          })
+          if (valid.length > 0) {
+            setActiveOffer({ amount: Number(valid[0].amount), threshold: Number(valid[0].threshold) })
+          } else {
+            // Fallback: parse embedded tag
+            const desc = (data as any)?.description || ''
+            const mAmount = desc.match(/\[OFFER\]:[^\n]*amount\s*=\s*([0-9]+(?:\.[0-9]+)?)/i)
+            const mThreshold = desc.match(/\[OFFER\]:[^\n]*threshold\s*=\s*([0-9]+(?:\.[0-9]+)?)/i)
+            if (mAmount && mThreshold) {
+              const amount = parseFloat(mAmount[1])
+              const threshold = parseFloat(mThreshold[1])
+              if (!isNaN(amount) && !isNaN(threshold)) setActiveOffer({ amount, threshold })
+              else setActiveOffer(null)
+            } else setActiveOffer(null)
+          }
+        } catch {
+          setActiveOffer(null)
+        }
+
+        // Parse extra image URLs from description section "Images supplémentaires:" lines beginning with - http(s)://
+        try {
+          const descText = ((data as any)?.description || '') as string
+          const imagesSectionMatch = descText.split(/Images supplémentaires:/i)[1]
+          if (imagesSectionMatch) {
+            const urls = imagesSectionMatch
+              .split(/\n+/)
+              .map((l) => l.replace(/^[-•]\s*/, '').trim())
+              .filter((l) => /^https?:\/\//i.test(l))
+          
+            setExtraImages(urls)
+          } else {
+            setExtraImages([])
+          }
+        } catch {
+          setExtraImages([])
+        }
         // Fetch related products by category (exclude current)
         if ((data as any)?.category_id) {
           const { data: rel } = await supabase
@@ -99,6 +151,25 @@ export default function ProductDetail() {
     loadReviews()
   }, [id])
 
+  useEffect(() => {
+    const loadSold = async () => {
+      if (!id) return
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('quantity')
+          .eq('product_id', id)
+          .eq('payment_status', 'paid')
+        if (error) throw error
+        const total = (data || []).reduce((sum, row) => sum + (row.quantity as any || 0), 0)
+        setSoldCount(total)
+      } catch {
+        setSoldCount(0)
+      }
+    }
+    loadSold()
+  }, [id])
+
   const waLink = useMemo(() => {
     if (!product?.seller?.phone_number) return null
     const digits = product.seller.phone_number.replace(/\D/g, "")
@@ -134,19 +205,47 @@ export default function ProductDetail() {
       <Button variant="ghost" onClick={() => navigate(-1)}>← Back</Button>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="rounded-xl overflow-hidden border border-border/50 bg-gradient-card">
-          <img src={product.image_url || "/placeholder.svg"} alt={product.title} className="w-full h-auto" />
+          {([product.image_url, ...extraImages].filter(Boolean) as string[]).length <= 1 ? (
+            <img src={product.image_url || "/placeholder.svg"} alt={product.title} className="w-full h-auto" />
+          ) : (
+            <div className="relative p-4">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {([product.image_url!, ...extraImages].filter(Boolean) as string[]).map((src, idx) => (
+                    <CarouselItem key={idx}>
+                      <img src={src} alt={`${product.title}-${idx + 1}`} className="w-full h-96 object-contain bg-background" />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="-left-2" />
+                <CarouselNext className="-right-2" />
+              </Carousel>
+            </div>
+          )}
         </div>
         <div className="space-y-4">
           <h1 className="text-3xl font-bold text-foreground">{product.title}</h1>
+        <div className="flex items-baseline gap-3">
           <div className="text-2xl font-semibold bg-gradient-luxury bg-clip-text text-transparent">
             {formatPrice(product.price)}
           </div>
+          {activeOffer && (
+            <div className="text-sm text-red-500">-{formatPrice(activeOffer.amount)} on {formatPrice(activeOffer.threshold)}</div>
+          )}
+        </div>
           <div className="text-sm text-muted-foreground">
             Vendeur : {product.seller?.name || 'Inconnu'}
           </div>
+        <div className="text-xs text-muted-foreground">Vendus: {soldCount}</div>
           <p className="text-muted-foreground whitespace-pre-line">{product.description}</p>
           <div className="flex flex-wrap gap-3 pt-2">
             <Button variant="luxury" onClick={() => addToCart(product.id, 1)}>{t('add_to_cart')}</Button>
+            <Button variant="default" onClick={() => {
+              addToCart(product.id, 1)
+              navigate('/checkout')
+            }}>
+              Acheter maintenant
+            </Button>
             <Button variant="outline" onClick={() => addToWishlist(product.id)} disabled={isInWishlist(product.id)}> 
               {isInWishlist(product.id) ? t('in_wishlist') : t('add_to_wishlist')}
             </Button>

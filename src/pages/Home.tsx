@@ -25,6 +25,10 @@ export default function Home() {
     window.location.assign('/search')
   }
 
+  const handleOpenFilters = () => {
+    window.location.assign('/search')
+  }
+
   const handleCategoryClick = (category: string) => {
     window.location.assign(`/marketplace?category=${category}`)
   }
@@ -98,7 +102,7 @@ export default function Home() {
           </div>
           
           <div className="flex gap-2 items-center">
-            <Button variant="outline" className="gap-2 h-12 border-border text-foreground hover:bg-accent">
+            <Button variant="outline" className="gap-2 h-12 border-border text-foreground hover:bg-accent" onClick={handleOpenFilters}>
               <Filter className="h-4 w-4" />
               Filtres
             </Button>

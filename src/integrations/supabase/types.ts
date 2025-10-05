@@ -152,6 +152,57 @@ export type Database = {
           },
         ]
       }
+      offers: {
+        Row: {
+          id: string
+          product_id: string
+          seller_id: string
+          amount: number
+          threshold: number
+          active: boolean | null
+          start_at: string | null
+          end_at: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          seller_id: string
+          amount: number
+          threshold: number
+          active?: boolean | null
+          start_at?: string | null
+          end_at?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          seller_id?: string
+          amount?: number
+          threshold?: number
+          active?: boolean | null
+          start_at?: string | null
+          end_at?: string | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_product_id_fkey",
+            columns: ["product_id"],
+            isOneToOne: false,
+            referencedRelation: "products",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offers_seller_id_fkey",
+            columns: ["seller_id"],
+            isOneToOne: false,
+            referencedRelation: "users",
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category_id: string | null
