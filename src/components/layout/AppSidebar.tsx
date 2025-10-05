@@ -49,7 +49,7 @@ export function AppSidebar() {
   const { categories } = useCategories()
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-all duration-200 ${
+    `flex items-center gap-2 rounded-full px-2.5 py-1.5 text-xs font-medium transition-all duration-200 ${
       isActive 
         ? "bg-primary text-primary-foreground shadow-md" 
         : "bg-primary/90 text-primary-foreground hover:bg-primary hover:shadow-md"
@@ -57,22 +57,22 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      className={collapsed ? "w-16" : "w-80"}
+      className={collapsed ? "w-16" : "w-64"}
       collapsible="icon"
     >
       <SidebarContent className="bg-background border-r">
         {/* Brand */}
-        <div className={`px-4 py-6 ${collapsed ? 'px-2' : ''}`}>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-primary-foreground font-bold">LH</span>
+        <div className={`px-3 py-4 ${collapsed ? 'px-2' : ''}`}>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-primary-foreground font-bold text-sm">LH</span>
             </div>
             {!collapsed && (
               <div>
-                <h1 className="text-xl font-bold text-primary">
+                <h1 className="text-base font-bold text-primary">
                   Luxury Haiti
                 </h1>
-                <p className="text-sm text-muted-foreground">Marché Premium</p>
+                <p className="text-xs text-muted-foreground">Marché Premium</p>
               </div>
             )}
           </div>
@@ -80,7 +80,7 @@ export function AppSidebar() {
 
         {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-muted-foreground font-normal text-base mb-2">
+          <SidebarGroupLabel className="px-3 text-muted-foreground font-normal text-xs mb-1">
             {!collapsed && "Parcourir"}
           </SidebarGroupLabel>
           <SidebarGroupContent className="px-2">
@@ -88,7 +88,7 @@ export function AppSidebar() {
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <NavLink to={item.url} end className={getNavCls}>
-                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    <item.icon className="h-4 w-4 flex-shrink-0" />
                     {!collapsed && <span>{item.title}</span>}
                   </NavLink>
                 </SidebarMenuItem>
@@ -100,14 +100,14 @@ export function AppSidebar() {
         {/* Categories Section */}
         {!collapsed && (
           <SidebarGroup>
-            <SidebarGroupLabel className="px-4 text-muted-foreground font-normal text-base mb-2">
+            <SidebarGroupLabel className="px-3 text-muted-foreground font-normal text-xs mb-1">
               Catégories
             </SidebarGroupLabel>
             <SidebarGroupContent className="px-2">
               <SidebarMenu className="space-y-1">
                 <SidebarMenuItem>
                   <NavLink to="/marketplace" className={getNavCls}>
-                    <Menu className="h-5 w-5 flex-shrink-0" />
+                    <Menu className="h-4 w-4 flex-shrink-0" />
                     <span>Toutes les catégories</span>
                   </NavLink>
                 </SidebarMenuItem>
@@ -119,7 +119,7 @@ export function AppSidebar() {
                         to={`/marketplace?category=${category.id}`} 
                         className={getNavCls}
                       >
-                        <IconComponent className="h-5 w-5 flex-shrink-0" />
+                        <IconComponent className="h-4 w-4 flex-shrink-0" />
                         <span>{category.name}</span>
                       </NavLink>
                     </SidebarMenuItem>
@@ -133,7 +133,7 @@ export function AppSidebar() {
         {/* Seller Section - Only show if authenticated and role is seller */}
         {user && role === 'seller' && !collapsed && (
           <SidebarGroup>
-            <SidebarGroupLabel className="px-4 text-muted-foreground font-normal text-base mb-2">
+            <SidebarGroupLabel className="px-3 text-muted-foreground font-normal text-xs mb-1">
               Vendre
             </SidebarGroupLabel>
             <SidebarGroupContent className="px-2">
@@ -141,7 +141,7 @@ export function AppSidebar() {
                 {sellerItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <NavLink to={item.url} className={getNavCls}>
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      <item.icon className="h-4 w-4 flex-shrink-0" />
                       <span>{item.title}</span>
                     </NavLink>
                   </SidebarMenuItem>
@@ -153,7 +153,7 @@ export function AppSidebar() {
 
         {/* Account Section */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-muted-foreground font-normal text-base mb-2">
+          <SidebarGroupLabel className="px-3 text-muted-foreground font-normal text-xs mb-1">
             {!collapsed && "Compte"}
           </SidebarGroupLabel>
           <SidebarGroupContent className="px-2">
@@ -162,7 +162,7 @@ export function AppSidebar() {
                 accountItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <NavLink to={item.url} className={getNavCls}>
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      <item.icon className="h-4 w-4 flex-shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuItem>
@@ -170,7 +170,7 @@ export function AppSidebar() {
               ) : (
                 <SidebarMenuItem>
                   <NavLink to="/auth" className={getNavCls}>
-                    <LogIn className="h-5 w-5 flex-shrink-0" />
+                    <LogIn className="h-4 w-4 flex-shrink-0" />
                     {!collapsed && <span>Se connecter pour vendre</span>}
                   </NavLink>
                 </SidebarMenuItem>
