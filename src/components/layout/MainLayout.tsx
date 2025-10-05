@@ -67,9 +67,6 @@ export function MainLayout({ children }: MainLayoutProps) {
                       {(user?.user_metadata as any)?.role === 'seller' && (
                         <MobileNavLink to="/seller" icon={ShoppingBag} label="Espace Vendeur" />
                       )}
-                      {(user?.user_metadata as any)?.role === 'admin' && (
-                        <MobileNavLink to="/admin" icon={Shield} label="Admin" />
-                      )}
                     </nav>
                   </SheetContent>
                 </Sheet>
@@ -102,26 +99,14 @@ export function MainLayout({ children }: MainLayoutProps) {
                       {user.email?.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  {(user.user_metadata as any)?.role === 'admin' && (
-                    <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
-                      <Shield className="h-4 w-4 mr-2" />
-                      Admin
-                    </Button>
-                  )}
                   <Button variant="ghost" size="icon" onClick={handleSignOut}>
                     <LogOut className="h-4 w-4" />
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" onClick={() => navigate("/auth")}>
-                    Se connecter pour vendre
-                  </Button>
-                  <Button variant="ghost" onClick={() => navigate("/admin/login")}>
-                    <Shield className="h-4 w-4 mr-2" />
-                    Connexion Admin
-                  </Button>
-                </div>
+                <Button variant="outline" onClick={() => navigate("/auth")}>
+                  Se connecter pour vendre
+                </Button>
               )}
             </div>
           </header>

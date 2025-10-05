@@ -1,7 +1,7 @@
-import { useState } from "react"
-import { Home, ShoppingBag, Store, User, Search, Heart, LogIn } from "lucide-react"
+import { Home, ShoppingBag, Store, User, Search, Heart, LogIn, Menu, Smartphone, Monitor, Headphones, Gamepad2 } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
+import { useCategories } from "@/hooks/useCategories"
 
 import {
   Sidebar,
@@ -12,7 +12,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
 
@@ -31,9 +30,14 @@ const accountItems = [
   { title: "Profil", url: "/profile", icon: User },
 ]
 
-const adminItems = [
-  { title: "Admin", url: "/admin", icon: User },
-]
+// Category icon mapping
+const categoryIcons: Record<string, any> = {
+  "Électronique": Monitor,
+  "Téléphones": Smartphone,
+  "Ordinateurs": Monitor,
+  "Audio & Casques": Headphones,
+  "Jeux": Gamepad2,
+}
 
 export function AppSidebar() {
   const { state } = useSidebar()
@@ -42,33 +46,33 @@ export function AppSidebar() {
   const collapsed = state === "collapsed"
   const { user } = useAuth()
   const role = (user?.user_metadata as any)?.role as string | undefined
+  const { categories } = useCategories()
 
-  const isActive = (path: string) => currentPath === path
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive 
-      ? "bg-primary text-primary-foreground shadow-luxury"
-      : "!bg-primary text-primary-foreground hover:!bg-primary/90 transition-all duration-200"
-
-  const menuButtonStaticCls = "!bg-primary !text-primary-foreground hover:!bg-primary focus:!bg-primary active:!bg-primary data-[active=true]:!bg-primary data-[active=true]:!text-primary-foreground"
+    `flex items-center gap-3 rounded-full px-4 py-3 font-medium transition-all duration-200 ${
+      isActive 
+        ? "bg-primary text-primary-foreground shadow-md" 
+        : "bg-primary/90 text-primary-foreground hover:bg-primary hover:shadow-md"
+    }`
 
   return (
     <Sidebar
-      className={collapsed ? "w-14" : "w-64"}
+      className={collapsed ? "w-16" : "w-80"}
       collapsible="icon"
     >
-      <SidebarContent className="bg-sidebar border-sidebar-border">
+      <SidebarContent className="bg-background border-r">
         {/* Brand */}
         <div className={`px-4 py-6 ${collapsed ? 'px-2' : ''}`}>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">LH</span>
+            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-primary-foreground font-bold">LH</span>
             </div>
             {!collapsed && (
               <div>
-                <h1 className="text-lg font-bold bg-gradient-luxury bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold text-primary">
                   Luxury Haiti
                 </h1>
-                <p className="text-xs text-sidebar-foreground/60">Marché Premium</p>
+                <p className="text-sm text-muted-foreground">Marché Premium</p>
               </div>
             )}
           </div>
@@ -76,64 +80,70 @@ export function AppSidebar() {
 
         {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
+          <SidebarGroupLabel className="px-4 text-muted-foreground font-normal text-base mb-2">
             {!collapsed && "Parcourir"}
           </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
+          <SidebarGroupContent className="px-2">
+            <SidebarMenu className="space-y-1">
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className={menuButtonStaticCls}>
-                    <NavLink to={item.url} end className={getNavCls}>
-                      <item.icon className="h-5 w-5" />
-                      {!collapsed && <span className="font-medium">{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
+                  <NavLink to={item.url} end className={getNavCls}>
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    {!collapsed && <span>{item.title}</span>}
+                  </NavLink>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Seller Section - Only show if authenticated and role is seller */}
-        {user && role === 'seller' && (
+        {/* Categories Section */}
+        {!collapsed && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
-            {!collapsed && "Vendre"}
+            <SidebarGroupLabel className="px-4 text-muted-foreground font-normal text-base mb-2">
+              Catégories
             </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {sellerItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className={menuButtonStaticCls}>
-                      <NavLink to={item.url} className={getNavCls}>
-                        <item.icon className="h-5 w-5" />
-                        {!collapsed && <span className="font-medium">{item.title}</span>}
+            <SidebarGroupContent className="px-2">
+              <SidebarMenu className="space-y-1">
+                <SidebarMenuItem>
+                  <NavLink to="/marketplace" className={getNavCls}>
+                    <Menu className="h-5 w-5 flex-shrink-0" />
+                    <span>Toutes les catégories</span>
+                  </NavLink>
+                </SidebarMenuItem>
+                {categories.slice(0, 5).map((category) => {
+                  const IconComponent = categoryIcons[category.name] || ShoppingBag
+                  return (
+                    <SidebarMenuItem key={category.id}>
+                      <NavLink 
+                        to={`/marketplace?category=${category.id}`} 
+                        className={getNavCls}
+                      >
+                        <IconComponent className="h-5 w-5 flex-shrink-0" />
+                        <span>{category.name}</span>
                       </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                    </SidebarMenuItem>
+                  )
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         )}
 
-        {/* Admin Section */}
-        {user && role === 'admin' && (
+        {/* Seller Section - Only show if authenticated and role is seller */}
+        {user && role === 'seller' && !collapsed && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
-            {!collapsed && "Admin"}
+            <SidebarGroupLabel className="px-4 text-muted-foreground font-normal text-base mb-2">
+              Vendre
             </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {adminItems.map((item) => (
+            <SidebarGroupContent className="px-2">
+              <SidebarMenu className="space-y-1">
+                {sellerItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className={menuButtonStaticCls}>
-                      <NavLink to={item.url} className={getNavCls}>
-                        <item.icon className="h-5 w-5" />
-                        {!collapsed && <span className="font-medium">{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
+                    <NavLink to={item.url} className={getNavCls}>
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      <span>{item.title}</span>
+                    </NavLink>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -143,30 +153,26 @@ export function AppSidebar() {
 
         {/* Account Section */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/60 font-medium">
+          <SidebarGroupLabel className="px-4 text-muted-foreground font-normal text-base mb-2">
             {!collapsed && "Compte"}
           </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
+          <SidebarGroupContent className="px-2">
+            <SidebarMenu className="space-y-1">
               {user ? (
                 accountItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink to={item.url} className={getNavCls}>
-                        <item.icon className="h-5 w-5" />
-                        {!collapsed && <span className="font-medium">{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
+                    <NavLink to={item.url} className={getNavCls}>
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
                   </SidebarMenuItem>
                 ))
               ) : (
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild className={menuButtonStaticCls}>
-                    <NavLink to="/auth" className={getNavCls}>
-                      <LogIn className="h-5 w-5" />
-                      {!collapsed && <span className="font-medium">Se connecter pour vendre</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
+                  <NavLink to="/auth" className={getNavCls}>
+                    <LogIn className="h-5 w-5 flex-shrink-0" />
+                    {!collapsed && <span>Se connecter pour vendre</span>}
+                  </NavLink>
                 </SidebarMenuItem>
               )}
             </SidebarMenu>
