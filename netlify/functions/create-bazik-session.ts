@@ -1,54 +1,68 @@
 import type { Handler } from '@netlify/functions'
 
-// Expected env vars (configure in Netlify):
-// BAZIK_SECRET_KEY, BAZIK_USER_ID, BAZIK_API_BASE
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 export const handler: Handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: corsHeaders }
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' }
+    return { statusCode: 405, body: 'Method Not Allowed', headers: corsHeaders }
   }
 
   try {
-    const secret = process.env.BAZIK_SECRET_KEY
-    const userId = process.env.BAZIK_USER_ID
-    const apiBase = process.env.BAZIK_API_BASE || 'https://api.bazik.io'
-    if (!secret || !userId) {
-      return { statusCode: 500, body: 'Missing Bazik configuration' }
-    }
+    const userId = 'bzk_d2f81d61_1759529138'
+    const secretKey = 'sk_57fa74cbce0ea195c6b7dbb5b45d8cfc'
+    const apiBase = 'https://api.bazik.io'
 
     const payload = JSON.parse(event.body || '{}') as {
-      currency: string
-      items: Array<{ name: string; quantity: number; amount: number }>
-      success_url: string
-      cancel_url: string
+      amount: number
+      currency?: string
       metadata?: Record<string, any>
     }
 
-    // Shape below assumes a generic Bazik session create. Adjust per API docs.
-    const res = await fetch(`${apiBase}/v1/checkout/sessions`, {
+    console.log('Creating Bazik payment for amount:', payload.amount)
+
+    const res = await fetch(`${apiBase}/payment/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${secret}`,
-        'x-bazik-user': userId,
+        'Authorization': `Bearer ${secretKey}`,
       },
       body: JSON.stringify({
-        currency: payload.currency || 'USD',
-        line_items: payload.items.map(i => ({ name: i.name, quantity: i.quantity, amount: Math.round(i.amount * 100) })),
-        success_url: payload.success_url,
-        cancel_url: payload.cancel_url,
-        metadata: payload.metadata || {},
+        user_id: userId,
+        amount: payload.amount,
+        currency: payload.currency || 'HTG',
       })
     })
 
-    if (!res.ok) {
-      const text = await res.text()
-      return { statusCode: 500, body: `Bazik error: ${text}` }
-    }
     const data = await res.json()
-    return { statusCode: 200, body: JSON.stringify(data) }
+    console.log('Bazik API response:', data)
+
+    if (!res.ok) {
+      return { 
+        statusCode: res.status, 
+        body: JSON.stringify({ error: data.message || 'Payment creation failed' }),
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    }
+
+    return { 
+      statusCode: 200, 
+      body: JSON.stringify(data),
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    }
   } catch (e: any) {
-    return { statusCode: 500, body: e?.message || 'Unknown error' }
+    console.error('Bazik payment error:', e)
+    return { 
+      statusCode: 500, 
+      body: JSON.stringify({ error: e?.message || 'Unknown error' }),
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    }
   }
 }
 

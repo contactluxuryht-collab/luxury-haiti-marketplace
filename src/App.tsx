@@ -22,6 +22,7 @@ import Terms from "./pages/Terms";
 import Help from "./pages/Help";
 import About from "./pages/About";
 import Checkout from "./pages/Checkout";
+import Success from "./pages/Success";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,11 @@ const App = () => (
             <Route path="/checkout" element={
               <MainLayout>
                 <Checkout />
+              </MainLayout>
+            } />
+            <Route path="/success" element={
+              <MainLayout>
+                <Success />
               </MainLayout>
             } />
             <Route path="/privacy" element={

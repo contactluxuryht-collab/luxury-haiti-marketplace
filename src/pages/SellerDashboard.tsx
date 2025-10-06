@@ -242,7 +242,9 @@ export default function SellerDashboard() {
     setFormError(null)
     setNewProduct({ 
       title: "", 
-      description: "", 
+      description: "",
+      offer_amount: "",
+      offer_threshold: "",
       price: "", 
       category_id: "", 
       quantity: "", 
