@@ -107,16 +107,32 @@ export default function Checkout() {
         body: JSON.stringify({
           amount: amount,
           currency: 'HTG',
-          metadata: { order_ids: orderIds }
+          metadata: { 
+            order_ids: orderIds,
+            firstName: 'John',
+            lastName: 'Doe',
+            email: user.email || 'customer@example.com'
+          }
         })
       })
 
-      if (!resp.ok) {
-        const error = await resp.json()
-        throw new Error(error.error || 'Failed to create payment')
+      const responseText = await resp.text()
+      console.log('Payment API raw response:', responseText)
+
+      let data: any
+      try {
+        data = JSON.parse(responseText)
+      } catch (jsonError) {
+        console.error('Failed to parse payment response:', jsonError)
+        alert('Payment failed: Invalid response from server')
+        throw new Error('Payment failed: Invalid response from server')
       }
 
-      const data = await resp.json()
+      if (!resp.ok) {
+        const errorMsg = data.error || 'Failed to create payment'
+        alert(`Payment failed: ${errorMsg}`)
+        throw new Error(errorMsg)
+      }
       
       // Check if payment was successful
       if (data.status === 'success' || data.success) {
@@ -124,12 +140,14 @@ export default function Checkout() {
         if (paymentMode === "cart") {
           await clearCart()
         }
+        alert('Payment completed successfully!')
         toast({ title: "Success", description: "Payment completed successfully!" })
         navigate('/success')
       } else if (data.payment_url || data.checkout_url || data.url) {
         // Redirect to payment page if URL provided
         window.location.href = data.payment_url || data.checkout_url || data.url
       } else {
+        alert('Payment failed, please try again')
         throw new Error('Payment failed, please try again')
       }
     } catch (e: any) {

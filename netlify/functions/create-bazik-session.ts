@@ -15,9 +15,8 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const userId = 'bzk_d2f81d61_1759529138'
-    const secretKey = 'sk_57fa74cbce0ea195c6b7dbb5b45d8cfc'
-    const apiBase = 'https://api.bazik.io'
+    const bearerToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    const apiEndpoint = 'https://api.bazik.io/moncash/token'
 
     const payload = JSON.parse(event.body || '{}') as {
       amount: number
@@ -25,28 +24,53 @@ export const handler: Handler = async (event) => {
       metadata?: Record<string, any>
     }
 
-    console.log('Creating Bazik payment for amount:', payload.amount)
+    console.log('Creating Bazik MonCash payment for amount:', payload.amount)
 
-    const res = await fetch(`${apiBase}/payment/create`, {
+    const requestBody = {
+      gdes: payload.amount,
+      description: `Payment for Order`,
+      referenceId: `BZK_sandbox_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      customerFirstName: payload.metadata?.firstName || 'Customer',
+      customerLastName: payload.metadata?.lastName || 'User',
+      customerEmail: payload.metadata?.email || 'customer@example.com'
+    }
+
+    console.log('Request body:', requestBody)
+
+    const res = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${secretKey}`,
+        'Authorization': `Bearer ${bearerToken}`,
       },
-      body: JSON.stringify({
-        user_id: userId,
-        amount: payload.amount,
-        currency: payload.currency || 'HTG',
-      })
+      body: JSON.stringify(requestBody)
     })
 
-    const data = await res.json()
-    console.log('Bazik API response:', data)
+    // Get raw response text first
+    const responseText = await res.text()
+    console.log('Raw API response:', responseText)
+
+    // Try to parse JSON
+    let data: any
+    try {
+      data = JSON.parse(responseText)
+      console.log('Parsed API response:', data)
+    } catch (jsonError) {
+      console.error('JSON parse error:', jsonError)
+      return { 
+        statusCode: 500, 
+        body: JSON.stringify({ 
+          error: 'Payment failed: Invalid response from server',
+          rawResponse: responseText.substring(0, 200) // Include first 200 chars for debugging
+        }),
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    }
 
     if (!res.ok) {
       return { 
         statusCode: res.status, 
-        body: JSON.stringify({ error: data.message || 'Payment creation failed' }),
+        body: JSON.stringify({ error: data.message || data.error || 'Payment creation failed' }),
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     }
