@@ -15,8 +15,9 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const bearerToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-    const apiEndpoint = 'https://api.bazik.io/moncash/token'
+    const userId = 'bzk_d2f81d61_1759529138'
+    const secretKey = 'sk_57fa74cbce0ea195c6b7dbb5b45d8cfc'
+    const apiBase = 'https://api.bazik.io'
 
     const payload = JSON.parse(event.body || '{}') as {
       amount: number
@@ -26,6 +27,58 @@ export const handler: Handler = async (event) => {
 
     console.log('Creating Bazik MonCash payment for amount:', payload.amount)
 
+    // Step 1: Authenticate and get access token
+    console.log('Step 1: Authenticating with Bazik...')
+    const authRes = await fetch(`${apiBase}/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userID: userId,
+        secretKey: secretKey
+      })
+    })
+
+    const authText = await authRes.text()
+    console.log('Auth response:', authText)
+
+    let authData: any
+    try {
+      authData = JSON.parse(authText)
+    } catch (jsonError) {
+      console.error('Auth JSON parse error:', jsonError)
+      return { 
+        statusCode: 500, 
+        body: JSON.stringify({ 
+          error: 'Authentication failed: Invalid response from server',
+          rawResponse: authText.substring(0, 200)
+        }),
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    }
+
+    if (!authRes.ok) {
+      return { 
+        statusCode: authRes.status, 
+        body: JSON.stringify({ error: authData.message || authData.error || 'Authentication failed' }),
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    }
+
+    const accessToken = authData.access_token
+    if (!accessToken) {
+      return { 
+        statusCode: 500, 
+        body: JSON.stringify({ error: 'No access token received from authentication' }),
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    }
+
+    console.log('Authentication successful, access token received')
+
+    // Step 2: Create MonCash payment
+    console.log('Step 2: Creating MonCash payment...')
     const requestBody = {
       gdes: payload.amount,
       description: `Payment for Order`,
@@ -35,13 +88,13 @@ export const handler: Handler = async (event) => {
       customerEmail: payload.metadata?.email || 'customer@example.com'
     }
 
-    console.log('Request body:', requestBody)
+    console.log('MonCash request body:', requestBody)
 
-    const res = await fetch(apiEndpoint, {
+    const res = await fetch(`${apiBase}/moncash/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${bearerToken}`,
+        'Authorization': `Bearer ${accessToken}`,
       },
       body: JSON.stringify(requestBody)
     })
