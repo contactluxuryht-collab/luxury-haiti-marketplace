@@ -29,7 +29,9 @@ export const handler: Handler = async (event) => {
 
     // Step 1: Authenticate and get access token
     console.log('Step 1: Authenticating with Bazik...')
-    const authRes = await fetch(`${apiBase}/token`, {
+    console.log('Using credentials:', { userID: userId, secretKey: '***' })
+    
+    const authRes = await fetch(`${apiBase}/auth/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +43,8 @@ export const handler: Handler = async (event) => {
     })
 
     const authText = await authRes.text()
-    console.log('Auth response:', authText)
+    console.log('Auth response status:', authRes.status)
+    console.log('Auth response body:', authText)
 
     let authData: any
     try {
@@ -75,7 +78,8 @@ export const handler: Handler = async (event) => {
       }
     }
 
-    console.log('Authentication successful, access token received')
+    console.log('Authentication successful!')
+    console.log('Access token:', accessToken)
 
     // Step 2: Create MonCash payment
     console.log('Step 2: Creating MonCash payment...')
@@ -101,13 +105,14 @@ export const handler: Handler = async (event) => {
 
     // Get raw response text first
     const responseText = await res.text()
-    console.log('Raw API response:', responseText)
+    console.log('Payment response status:', res.status)
+    console.log('Payment response body:', responseText)
 
     // Try to parse JSON
     let data: any
     try {
       data = JSON.parse(responseText)
-      console.log('Parsed API response:', data)
+      console.log('Parsed payment response:', JSON.stringify(data, null, 2))
     } catch (jsonError) {
       console.error('JSON parse error:', jsonError)
       return { 
