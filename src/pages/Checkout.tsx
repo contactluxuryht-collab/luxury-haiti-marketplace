@@ -101,6 +101,7 @@ export default function Checkout() {
       }
 
       // Create Bazik payment
+      console.log('Creating Bazik payment for amount:', amount)
       const resp = await fetch('/.netlify/functions/create-bazik-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -116,39 +117,78 @@ export default function Checkout() {
         })
       })
 
+      console.log('Payment API response status:', resp.status)
       const responseText = await resp.text()
       console.log('Payment API raw response:', responseText)
+
+      // Check if response is empty
+      if (!responseText || responseText.trim() === '') {
+        console.error('Empty response from payment API')
+        toast({ 
+          title: "Payment Error", 
+          description: "Received empty response from payment server. Please try again.", 
+          variant: "destructive" 
+        })
+        return
+      }
 
       let data: any
       try {
         data = JSON.parse(responseText)
+        console.log('Parsed payment response:', data)
       } catch (jsonError) {
         console.error('Failed to parse payment response:', jsonError)
-        alert('Payment failed: Invalid response from server')
-        throw new Error('Payment failed: Invalid response from server')
+        console.error('Raw response that failed to parse:', responseText)
+        toast({ 
+          title: "Payment Error", 
+          description: "Invalid response from payment server. Please try again.", 
+          variant: "destructive" 
+        })
+        return
       }
 
       if (!resp.ok) {
-        const errorMsg = data.error || 'Failed to create payment'
-        alert(`Payment failed: ${errorMsg}`)
-        throw new Error(errorMsg)
+        const errorMsg = data.error || data.details || 'Failed to create payment'
+        console.error('Payment API error:', errorMsg)
+        toast({ 
+          title: "Payment Failed", 
+          description: errorMsg, 
+          variant: "destructive" 
+        })
+        return
       }
       
       // Check if payment was successful
-      if (data.status === 'success' || data.success) {
+      if (data.success === true || data.status === 'success') {
         // Clear cart if using cart mode
         if (paymentMode === "cart") {
           await clearCart()
         }
-        alert('Payment completed successfully!')
-        toast({ title: "Success", description: "Payment completed successfully!" })
-        navigate('/success')
+        toast({ 
+          title: "Payment Success", 
+          description: "Payment completed successfully! Redirecting to payment page..." 
+        })
+        
+        // Redirect to payment page if URL provided
+        if (data.payment_url) {
+          window.location.href = data.payment_url
+        } else {
+          navigate('/success')
+        }
       } else if (data.payment_url || data.checkout_url || data.url) {
         // Redirect to payment page if URL provided
+        toast({ 
+          title: "Redirecting", 
+          description: "Redirecting to payment page..." 
+        })
         window.location.href = data.payment_url || data.checkout_url || data.url
       } else {
-        alert('Payment failed, please try again')
-        throw new Error('Payment failed, please try again')
+        console.error('Unexpected payment response structure:', data)
+        toast({ 
+          title: "Payment Error", 
+          description: "Unexpected response from payment server. Please try again.", 
+          variant: "destructive" 
+        })
       }
     } catch (e: any) {
       console.error('Payment error:', e)
