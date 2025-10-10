@@ -28,7 +28,48 @@ import {
   XCircle,
   TrendingUp,
   Activity,
-  AlertCircle
+  AlertCircle,
+  Settings,
+  BarChart3,
+  FileText,
+  CreditCard,
+  Bell,
+  Database,
+  Lock,
+  Palette,
+  Calendar,
+  Clock,
+  Eye,
+  Download,
+  Upload,
+  RefreshCw,
+  Search,
+  Filter,
+  MoreHorizontal,
+  Star,
+  MessageSquare,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Monitor,
+  Smartphone,
+  Tablet,
+  Wifi,
+  Server,
+  HardDrive,
+  Cpu,
+  MemoryStick,
+  Zap,
+  Target,
+  TrendingDown,
+  Minus,
+  ArrowUp,
+  ArrowDown,
+  Equal,
+  PieChart,
+  LineChart,
+  AreaChart
 } from "lucide-react"
 
 type SellerRow = {
@@ -78,6 +119,17 @@ export default function AdminDashboard() {
     totalOrders: 0,
     activeProducts: 0,
     inactiveProducts: 0,
+    totalRevenue: 0,
+    monthlyRevenue: 0,
+    weeklyOrders: 0,
+    averageOrderValue: 0,
+    conversionRate: 0,
+    totalCategories: 0,
+    systemUptime: 0,
+    activeUsers: 0,
+    newUsersToday: 0,
+    pendingReviews: 0,
+    lowStockProducts: 0,
   })
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [newProduct, setNewProduct] = useState({
@@ -88,6 +140,32 @@ export default function AdminDashboard() {
     image_url: "",
   })
   const [saving, setSaving] = useState(false)
+  const [orders, setOrders] = useState<any[]>([])
+  const [allUsers, setAllUsers] = useState<any[]>([])
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [systemSettings, setSystemSettings] = useState({
+    siteName: "Luxury Haiti Marketplace",
+    siteDescription: "Marché Premium Haïtien",
+    maintenanceMode: false,
+    allowRegistration: true,
+    requireEmailVerification: true,
+    maxFileSize: 10,
+    supportedFormats: "jpg,png,gif,webp",
+    currency: "USD",
+    timezone: "America/Port-au-Prince",
+    language: "fr",
+    theme: "light",
+    analyticsEnabled: true,
+    emailNotifications: true,
+    smsNotifications: false,
+  })
+  const [auditLogs, setAuditLogs] = useState<any[]>([])
+  const [backupStatus, setBackupStatus] = useState({
+    lastBackup: null,
+    nextBackup: null,
+    status: "healthy",
+    size: "0 MB"
+  })
   const isAdmin = useMemo(() => (user?.user_metadata as any)?.role === 'admin', [user])
 
   useEffect(() => {
@@ -100,6 +178,10 @@ export default function AdminDashboard() {
       fetchOverview()
       fetchSellers()
       fetchAllProducts()
+      fetchOrders()
+      fetchAllUsers()
+      fetchNotifications()
+      fetchAuditLogs()
       
       const channel = supabase
         .channel('sellers-admin')
@@ -133,26 +215,84 @@ export default function AdminDashboard() {
   }, [products])
 
   const fetchOverview = async () => {
-    // Users
-    const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true })
-    const { count: sellersCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'seller')
-    const { data: pendingData } = await supabase.from('users').select('id, email, name, role, business_name').eq('role', 'seller')
-    const pending = (pendingData || []).filter((r: any) => !r.seller_approved).length
-    // Products
-    const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true })
-    const { count: activeProductsCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', true)
-    const { count: inactiveProductsCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', false)
-    // Orders
-    const { count: ordersCount } = await supabase.from('orders').select('*', { count: 'exact', head: true })
-    setStats({
-      totalUsers: usersCount || 0,
-      totalSellers: sellersCount || 0,
-      pendingSellers: pending || 0,
-      totalProducts: productsCount || 0,
-      totalOrders: ordersCount || 0,
-      activeProducts: activeProductsCount || 0,
-      inactiveProducts: inactiveProductsCount || 0,
-    })
+    try {
+      // Users
+      const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true })
+      const { count: sellersCount } = await supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'seller')
+      const { data: pendingData } = await supabase.from('users').select('id, email, name, role, business_name').eq('role', 'seller')
+      const pending = (pendingData || []).filter((r: any) => !r.seller_approved).length
+      
+      // Products
+      const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true })
+      const { count: activeProductsCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', true)
+      const { count: inactiveProductsCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', false)
+      
+      // Orders and Revenue
+      const { count: ordersCount } = await supabase.from('orders').select('*', { count: 'exact', head: true })
+      const { data: ordersData } = await supabase.from('orders').select('total_amount, created_at')
+      const totalRevenue = ordersData?.reduce((sum, order) => sum + (order.total_amount || 0), 0) || 0
+      
+      // Monthly revenue (last 30 days)
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+      const monthlyOrders = ordersData?.filter(order => 
+        new Date(order.created_at) >= thirtyDaysAgo
+      ) || []
+      const monthlyRevenue = monthlyOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0)
+      
+      // Weekly orders (last 7 days)
+      const sevenDaysAgo = new Date()
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+      const weeklyOrders = ordersData?.filter(order => 
+        new Date(order.created_at) >= sevenDaysAgo
+      ).length || 0
+      
+      // Average order value
+      const averageOrderValue = ordersCount > 0 ? totalRevenue / ordersCount : 0
+      
+      // Categories
+      const { count: categoriesCount } = await supabase.from('categories').select('*', { count: 'exact', head: true })
+      
+      // Today's new users
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const { count: newUsersToday } = await supabase.from('users')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', today.toISOString())
+      
+      // Active users (last 7 days)
+      const { count: activeUsers } = await supabase.from('users')
+        .select('*', { count: 'exact', head: true })
+        .gte('updated_at', sevenDaysAgo.toISOString())
+      
+      // Reviews
+      const { count: pendingReviews } = await supabase.from('reviews')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending')
+      
+      setStats({
+        totalUsers: usersCount || 0,
+        totalSellers: sellersCount || 0,
+        pendingSellers: pending || 0,
+        totalProducts: productsCount || 0,
+        totalOrders: ordersCount || 0,
+        activeProducts: activeProductsCount || 0,
+        inactiveProducts: inactiveProductsCount || 0,
+        totalRevenue: totalRevenue,
+        monthlyRevenue: monthlyRevenue,
+        weeklyOrders: weeklyOrders,
+        averageOrderValue: averageOrderValue,
+        conversionRate: usersCount > 0 ? (ordersCount / usersCount) * 100 : 0,
+        totalCategories: categoriesCount || 0,
+        systemUptime: 99.9, // Mock data
+        activeUsers: activeUsers || 0,
+        newUsersToday: newUsersToday || 0,
+        pendingReviews: pendingReviews || 0,
+        lowStockProducts: 0, // Mock data
+      })
+    } catch (error) {
+      console.error('Error fetching overview:', error)
+    }
   }
 
   const fetchAllProducts = async () => {
@@ -188,6 +328,125 @@ export default function AdminDashboard() {
       console.error('Fetch sellers error:', err)
       toast({ title: 'Error', description: 'Failed to fetch sellers: ' + err.message, variant: 'destructive' })
       setSellers([])
+    }
+  }
+
+  const fetchOrders = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          buyer:users!orders_buyer_id_fkey(name, email),
+          seller:users!orders_seller_id_fkey(name, email)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      
+      if (error) {
+        console.error('Error fetching orders:', error)
+        setOrders([])
+      } else {
+        setOrders(data || [])
+      }
+    } catch (err: any) {
+      console.error('Fetch orders error:', err)
+      setOrders([])
+    }
+  }
+
+  const fetchAllUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, auth_id, email, name, role, created_at, updated_at')
+        .order('created_at', { ascending: false })
+        .limit(100)
+      
+      if (error) {
+        console.error('Error fetching users:', error)
+        setAllUsers([])
+      } else {
+        setAllUsers(data || [])
+      }
+    } catch (err: any) {
+      console.error('Fetch users error:', err)
+      setAllUsers([])
+    }
+  }
+
+  const fetchNotifications = async () => {
+    try {
+      // Mock notifications for now
+      const mockNotifications = [
+        {
+          id: '1',
+          type: 'new_seller',
+          title: 'Nouveau vendeur en attente',
+          message: 'John Doe souhaite devenir vendeur',
+          created_at: new Date().toISOString(),
+          read: false
+        },
+        {
+          id: '2',
+          type: 'low_stock',
+          title: 'Stock faible',
+          message: 'Le produit "iPhone 15" est en rupture de stock',
+          created_at: new Date(Date.now() - 3600000).toISOString(),
+          read: false
+        },
+        {
+          id: '3',
+          type: 'system',
+          title: 'Maintenance programmée',
+          message: 'Maintenance système prévue demain à 2h00',
+          created_at: new Date(Date.now() - 7200000).toISOString(),
+          read: true
+        }
+      ]
+      setNotifications(mockNotifications)
+    } catch (err: any) {
+      console.error('Fetch notifications error:', err)
+      setNotifications([])
+    }
+  }
+
+  const fetchAuditLogs = async () => {
+    try {
+      // Mock audit logs for now
+      const mockLogs = [
+        {
+          id: '1',
+          user_id: user?.id,
+          action: 'LOGIN',
+          resource: 'admin_dashboard',
+          details: 'Admin login successful',
+          ip_address: '192.168.1.100',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          user_id: user?.id,
+          action: 'UPDATE',
+          resource: 'seller_approval',
+          details: 'Approved seller: john@example.com',
+          ip_address: '192.168.1.100',
+          created_at: new Date(Date.now() - 1800000).toISOString()
+        },
+        {
+          id: '3',
+          user_id: user?.id,
+          action: 'DELETE',
+          resource: 'product',
+          details: 'Deleted product: iPhone 14',
+          ip_address: '192.168.1.100',
+          created_at: new Date(Date.now() - 3600000).toISOString()
+        }
+      ]
+      setAuditLogs(mockLogs)
+    } catch (err: any) {
+      console.error('Fetch audit logs error:', err)
+      setAuditLogs([])
     }
   }
 
@@ -410,17 +669,30 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
         <Card className="border-border/50 hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total utilisateurs</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">{stats.totalUsers}</div>
+            <div className="text-2xl font-bold text-foreground">{stats.totalUsers}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
-              +12% par rapport au mois dernier
+              <TrendingUp className="h-3 w-3 text-green-500" />
+              +{stats.newUsersToday} aujourd'hui
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/50 hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Utilisateurs actifs</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">{stats.activeUsers}</div>
+            <p className="text-xs text-muted-foreground">
+              Derniers 7 jours
             </p>
           </CardContent>
         </Card>
@@ -431,7 +703,7 @@ export default function AdminDashboard() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">{stats.totalProducts}</div>
+            <div className="text-2xl font-bold text-foreground">{stats.totalProducts}</div>
             <p className="text-xs text-muted-foreground">
               {stats.activeProducts} actifs, {stats.inactiveProducts} inactifs
             </p>
@@ -444,10 +716,23 @@ export default function AdminDashboard() {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">{stats.totalOrders}</div>
+            <div className="text-2xl font-bold text-foreground">{stats.totalOrders}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <Activity className="h-3 w-3" />
-              Commandes à vie
+              <Clock className="h-3 w-3" />
+              {stats.weeklyOrders} cette semaine
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/50 hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Revenus totaux</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">${stats.totalRevenue.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              ${stats.monthlyRevenue.toLocaleString()} ce mois
             </p>
           </CardContent>
         </Card>
@@ -458,20 +743,205 @@ export default function AdminDashboard() {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-foreground">{stats.pendingSellers}</div>
+            <div className="text-2xl font-bold text-foreground">{stats.pendingSellers}</div>
             <p className="text-xs text-muted-foreground">
-              En attente d’approbation
+              En attente d'approbation
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Metrics Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="border-border/50 hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Panier moyen</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">${stats.averageOrderValue.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">
+              Valeur moyenne par commande
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/50 hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Taux de conversion</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">{stats.conversionRate.toFixed(1)}%</div>
+            <p className="text-xs text-muted-foreground">
+              Utilisateurs → Commandes
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/50 hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Catégories</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">{stats.totalCategories}</div>
+            <p className="text-xs text-muted-foreground">
+              Catégories actives
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/50 hover:shadow-lg transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Disponibilité</CardTitle>
+            <Server className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">{stats.systemUptime}%</div>
+            <p className="text-xs text-muted-foreground">
+              Temps de fonctionnement
             </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="sellers" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="sellers">Gestion des vendeurs</TabsTrigger>
-          <TabsTrigger value="products">Gestion des produits</TabsTrigger>
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="sellers">Vendeurs</TabsTrigger>
+          <TabsTrigger value="products">Produits</TabsTrigger>
+          <TabsTrigger value="orders">Commandes</TabsTrigger>
+          <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+          <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="border-border/50 hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Bell className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Notifications</h3>
+                    <p className="text-sm text-muted-foreground">{notifications.filter(n => !n.read).length} non lues</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/50 hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Analytics</h3>
+                    <p className="text-sm text-muted-foreground">Voir les rapports</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/50 hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Database className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Sauvegarde</h3>
+                    <p className="text-sm text-muted-foreground">Dernière: {backupStatus.lastBackup || 'Jamais'}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/50 hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <Settings className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Configuration</h3>
+                    <p className="text-sm text-muted-foreground">Paramètres système</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Financial Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Aperçu financier
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Revenus totaux</span>
+                    <span className="font-semibold text-lg">${stats.totalRevenue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Ce mois</span>
+                    <span className="font-medium">${stats.monthlyRevenue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Panier moyen</span>
+                    <span className="font-medium">${stats.averageOrderValue.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Commandes totales</span>
+                    <span className="font-medium">{stats.totalOrders}</span>
+                  </div>
+                  <div className="pt-2 border-t">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Taux de conversion</span>
+                      <Badge variant="secondary">{stats.conversionRate.toFixed(1)}%</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Activité récente
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {auditLogs.slice(0, 5).map((log) => (
+                    <div key={log.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Shield className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium">{log.details}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(log.created_at).toLocaleString()}
+                        </p>
+                      </div>
+                      <Badge variant="outline">{log.action}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         <TabsContent value="sellers" className="space-y-6">
           <Card className="border-border/50">
@@ -663,6 +1133,315 @@ export default function AdminDashboard() {
                   ))}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="orders" className="space-y-6">
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingCart className="h-5 w-5" />
+                Gestion des commandes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Commande</TableHead>
+                    <TableHead>Acheteur</TableHead>
+                    <TableHead>Vendeur</TableHead>
+                    <TableHead>Montant</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {orders.map((order) => (
+                    <TableRow key={order.id}>
+                      <TableCell className="font-medium">#{order.id.slice(0, 8)}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{order.buyer?.name || 'Inconnu'}</div>
+                          <div className="text-sm text-muted-foreground">{order.buyer?.email}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{order.seller?.name || 'Inconnu'}</div>
+                          <div className="text-sm text-muted-foreground">{order.seller?.email}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium">${order.total_amount?.toLocaleString() || '0'}</TableCell>
+                      <TableCell>
+                        <Badge variant={order.status === 'completed' ? 'default' : 'outline'}>
+                          {order.status || 'En attente'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-3 w-3 mr-1" />
+                          Voir
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-6">
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Gestion des utilisateurs
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nom</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Rôle</TableHead>
+                    <TableHead>Inscription</TableHead>
+                    <TableHead>Dernière activité</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {allUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">{user.name || '—'}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Badge variant={user.role === 'admin' ? 'default' : user.role === 'seller' ? 'secondary' : 'outline'}>
+                          {user.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>{new Date(user.updated_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-3 w-3 mr-1" />
+                          Voir
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* System Settings */}
+            <Card className="border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Paramètres système
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="siteName">Nom du site</Label>
+                  <Input 
+                    id="siteName"
+                    value={systemSettings.siteName} 
+                    onChange={(e) => setSystemSettings({...systemSettings, siteName: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="siteDescription">Description du site</Label>
+                  <Textarea 
+                    id="siteDescription"
+                    value={systemSettings.siteDescription} 
+                    onChange={(e) => setSystemSettings({...systemSettings, siteDescription: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="currency">Devise</Label>
+                  <Select value={systemSettings.currency} onValueChange={(value) => setSystemSettings({...systemSettings, currency: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USD">USD ($)</SelectItem>
+                      <SelectItem value="HTG">HTG (G)</SelectItem>
+                      <SelectItem value="EUR">EUR (€)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="timezone">Fuseau horaire</Label>
+                  <Select value={systemSettings.timezone} onValueChange={(value) => setSystemSettings({...systemSettings, timezone: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="America/Port-au-Prince">Port-au-Prince (GMT-5)</SelectItem>
+                      <SelectItem value="America/New_York">New York (GMT-5)</SelectItem>
+                      <SelectItem value="Europe/Paris">Paris (GMT+1)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button className="w-full">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Sauvegarder les paramètres
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Security Settings */}
+            <Card className="border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lock className="h-5 w-5" />
+                  Sécurité
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Mode maintenance</Label>
+                    <p className="text-sm text-muted-foreground">Désactiver l'accès public</p>
+                  </div>
+                  <Button 
+                    variant={systemSettings.maintenanceMode ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSystemSettings({...systemSettings, maintenanceMode: !systemSettings.maintenanceMode})}
+                  >
+                    {systemSettings.maintenanceMode ? "Actif" : "Inactif"}
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Inscription autorisée</Label>
+                    <p className="text-sm text-muted-foreground">Permettre les nouveaux comptes</p>
+                  </div>
+                  <Button 
+                    variant={systemSettings.allowRegistration ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSystemSettings({...systemSettings, allowRegistration: !systemSettings.allowRegistration})}
+                  >
+                    {systemSettings.allowRegistration ? "Autorisé" : "Interdit"}
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Vérification email</Label>
+                    <p className="text-sm text-muted-foreground">Exiger la vérification</p>
+                  </div>
+                  <Button 
+                    variant={systemSettings.requireEmailVerification ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSystemSettings({...systemSettings, requireEmailVerification: !systemSettings.requireEmailVerification})}
+                  >
+                    {systemSettings.requireEmailVerification ? "Requis" : "Optionnel"}
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Analytics</Label>
+                    <p className="text-sm text-muted-foreground">Collecter les données</p>
+                  </div>
+                  <Button 
+                    variant={systemSettings.analyticsEnabled ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSystemSettings({...systemSettings, analyticsEnabled: !systemSettings.analyticsEnabled})}
+                  >
+                    {systemSettings.analyticsEnabled ? "Activé" : "Désactivé"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Category Management */}
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Gestion des catégories
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">Catégories existantes</h4>
+                  <Button size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Ajouter une catégorie
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {categories.map((category) => (
+                    <div key={category.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">{category.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {allProducts.filter(p => p.category_id === category.id).length} produits
+                        </p>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline">
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Backup & Maintenance */}
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="h-5 w-5" />
+                Sauvegarde et maintenance
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium">Sauvegarde automatique</h4>
+                  <p className="text-sm text-muted-foreground">Dernière: {backupStatus.lastBackup || 'Jamais'}</p>
+                  <Button variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Créer une sauvegarde
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium">Cache système</h4>
+                  <p className="text-sm text-muted-foreground">Nettoyer le cache</p>
+                  <Button variant="outline" size="sm">
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Vider le cache
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium">Logs système</h4>
+                  <p className="text-sm text-muted-foreground">Consulter les logs</p>
+                  <Button variant="outline" size="sm">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Voir les logs
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

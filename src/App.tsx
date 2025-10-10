@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Marketplace from "./pages/Marketplace";
 import Search from "./pages/Search";
 import Wishlist from "./pages/Wishlist";
+import Cart from "./pages/Cart";
 import SellerDashboard from "./pages/SellerDashboard";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -57,6 +58,11 @@ const App = () => (
             <Route path="/wishlist" element={
               <MainLayout>
                 <Wishlist />
+              </MainLayout>
+            } />
+            <Route path="/cart" element={
+              <MainLayout>
+                <Cart />
               </MainLayout>
             } />
             <Route path="/seller" element={

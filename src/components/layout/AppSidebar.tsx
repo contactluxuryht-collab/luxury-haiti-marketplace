@@ -1,4 +1,4 @@
-import { Home, ShoppingBag, Store, User, Search, Heart, LogIn, Menu, Smartphone, Monitor, Headphones, Gamepad2 } from "lucide-react"
+import { Home, ShoppingBag, Store, User, Search, Heart, LogIn, Menu, Smartphone, Monitor, Headphones, Gamepad2, ShoppingCart, Shield } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { useCategories } from "@/hooks/useCategories"
@@ -19,6 +19,7 @@ const navigationItems = [
   { title: "Accueil", url: "/", icon: Home },
   { title: "Marché", url: "/marketplace", icon: ShoppingBag },
   { title: "Recherche", url: "/search", icon: Search },
+  { title: "Panier", url: "/cart", icon: ShoppingCart },
   { title: "Favoris", url: "/wishlist", icon: Heart },
 ]
 
@@ -28,6 +29,10 @@ const sellerItems = [
 
 const accountItems = [
   { title: "Profil", url: "/profile", icon: User },
+]
+
+const adminItems = [
+  { title: "Tableau de bord Admin", url: "/admin", icon: Shield },
 ]
 
 // Category icon mapping
@@ -139,6 +144,27 @@ export function AppSidebar() {
             <SidebarGroupContent className="px-2">
               <SidebarMenu className="space-y-1">
                 {sellerItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <NavLink to={item.url} className={getNavCls}>
+                      <item.icon className="h-4 w-4 flex-shrink-0" />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Admin Section - Only show if authenticated and role is admin */}
+        {user && role === 'admin' && !collapsed && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="px-3 text-muted-foreground font-normal text-xs mb-1">
+              Administration
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="px-2">
+              <SidebarMenu className="space-y-1">
+                {adminItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <NavLink to={item.url} className={getNavCls}>
                       <item.icon className="h-4 w-4 flex-shrink-0" />

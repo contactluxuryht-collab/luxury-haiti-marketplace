@@ -2,10 +2,11 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { Footer } from "./Footer";
 import { Button } from "@/components/ui/button";
-import { Bell, Home, LogOut, Search, Shield, ShoppingBag, Heart, User, Menu } from "lucide-react";
+import { Bell, Home, LogOut, Search, Shield, ShoppingBag, Heart, User, Menu, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useSettings } from "@/hooks/useSettings";
+import { useCart } from "@/hooks/useCart";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -23,6 +24,7 @@ export function MainLayout({
     setCurrency,
     t
   } = useSettings();
+  const { totalItems } = useCart();
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
@@ -66,9 +68,11 @@ export function MainLayout({
                       <MobileNavLink to="/" icon={Home} label="Accueil" />
                       <MobileNavLink to="/marketplace" icon={ShoppingBag} label="Marché" />
                       <MobileNavLink to="/search" icon={Search} label="Recherche" />
+                      <MobileNavLink to="/cart" icon={ShoppingCart} label="Panier" />
                       <MobileNavLink to="/wishlist" icon={Heart} label="Favoris" />
                       <MobileNavLink to="/profile" icon={User} label="Profil" />
                       {(user?.user_metadata as any)?.role === 'seller' && <MobileNavLink to="/seller" icon={ShoppingBag} label="Espace Vendeur" />}
+                      {(user?.user_metadata as any)?.role === 'admin' && <MobileNavLink to="/admin" icon={Shield} label="Admin" />}
                     </nav>
                   </SheetContent>
                 </Sheet>
@@ -85,12 +89,36 @@ export function MainLayout({
                 <option value="HTG">HTG</option>
                 <option value="USD">USD</option>
               </select>
+              
+              {/* Cart Button */}
+              <Button variant="ghost" size="icon" className="relative" onClick={() => navigate('/cart')}>
+                <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-semibold">
+                    {totalItems}
+                  </span>
+                )}
+              </Button>
+              
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"></span>
               </Button>
               
               {user ? <div className="flex items-center gap-2">
+                  {/* Admin Dashboard Button - Only show for admin users */}
+                  {(user?.user_metadata as any)?.role === 'admin' && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => navigate('/admin')}
+                      className="bg-gradient-primary text-primary-foreground hover:opacity-90"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin
+                    </Button>
+                  )}
+                  
                   <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
                     <span className="text-primary-foreground text-sm font-semibold">
                       {user.email?.charAt(0).toUpperCase()}
@@ -117,8 +145,8 @@ export function MainLayout({
               <BottomNavLink to="/" icon={Home} label="Accueil" />
               <BottomNavLink to="/marketplace" icon={ShoppingBag} label="Marché" />
               <BottomNavLink to="/search" icon={Search} label="Recherche" />
+              <BottomNavLink to="/cart" icon={ShoppingCart} label="Panier" />
               <BottomNavLink to="/wishlist" icon={Heart} label="Favoris" />
-              <BottomNavLink to="/profile" icon={User} label="Profil" />
             </div>
           </nav>
         </div>

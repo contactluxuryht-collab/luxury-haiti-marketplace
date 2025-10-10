@@ -14,6 +14,7 @@ export interface CartItem {
 export function useCart() {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [productPrices, setProductPrices] = useState<Record<string, number>>({})
   const { user } = useAuth()
   const { toast } = useToast()
 
@@ -42,6 +43,21 @@ export function useCart() {
       if (error) throw error
 
       setCartItems(data || [])
+      
+      // Fetch product prices for cart items
+      if (data && data.length > 0) {
+        const productIds = [...new Set(data.map(item => item.product_id))]
+        const { data: products } = await supabase
+          .from('products')
+          .select('id, price')
+          .in('id', productIds)
+        
+        const prices: Record<string, number> = {}
+        products?.forEach(product => {
+          prices[product.id] = product.price
+        })
+        setProductPrices(prices)
+      }
     } catch (error) {
       console.error('Error fetching cart items:', error)
     } finally {
@@ -99,6 +115,20 @@ export function useCart() {
         title: "Added to cart",
         description: "Item has been added to your cart",
       })
+
+      // Fetch the product price for the new item
+      const { data: product } = await supabase
+        .from('products')
+        .select('id, price')
+        .eq('id', productId)
+        .single()
+      
+      if (product) {
+        setProductPrices(prev => ({
+          ...prev,
+          [product.id]: product.price
+        }))
+      }
 
       fetchCartItems()
     } catch (error) {
@@ -201,8 +231,8 @@ export function useCart() {
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
   const totalPrice = cartItems.reduce((sum, item) => {
-    // For now, we'll need to fetch product prices separately or hardcode
-    return sum + 50 * item.quantity // Placeholder price
+    const price = productPrices[item.product_id] || 0
+    return sum + (price * item.quantity)
   }, 0)
 
   return {

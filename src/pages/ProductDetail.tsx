@@ -237,7 +237,8 @@ export default function ProductDetail() {
             Vendeur : {product.seller?.name || 'Inconnu'}
           </div>
         <div className="text-xs text-muted-foreground">Vendus: {soldCount}</div>
-          <p className="text-muted-foreground whitespace-pre-line">{product.description}</p>
+          
+          {/* Action Buttons - Moved here after "Vendus" */}
           <div className="flex flex-wrap gap-3 pt-2">
             <Button variant="luxury" onClick={() => addToCart(product.id, 1)}>{t('add_to_cart')}</Button>
             <Button variant="default" onClick={() => {
@@ -246,15 +247,17 @@ export default function ProductDetail() {
             }}>
               Acheter maintenant
             </Button>
-            <Button variant="outline" onClick={() => addToWishlist(product.id)} disabled={isInWishlist(product.id)}> 
-              {isInWishlist(product.id) ? t('in_wishlist') : t('add_to_wishlist')}
-            </Button>
             {waLink && (
               <Button variant="secondary" onClick={() => window.open(waLink!, '_blank')}>
                 <MessageCircle className="h-4 w-4 mr-1" /> {t('whatsapp_seller')}
               </Button>
             )}
+            <Button variant="outline" onClick={() => addToWishlist(product.id)} disabled={isInWishlist(product.id)}> 
+              {isInWishlist(product.id) ? t('in_wishlist') : t('add_to_wishlist')}
+            </Button>
           </div>
+          
+          <p className="text-muted-foreground whitespace-pre-line">{product.description}</p>
         </div>
       </div>
       {related.length > 0 && (
