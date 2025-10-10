@@ -102,11 +102,18 @@ export default function Checkout() {
 
       // Create Bazik payment
       console.log('Creating Bazik payment for amount:', amount)
-      const resp = await fetch('/.netlify/functions/create-bazik-session', {
+      
+      // Generate order ID if not provided
+      const orderId = orderIds.length > 0 ? orderIds[0] : `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      
+      const resp = await fetch('/api/create-bazik-session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({
           amount: amount,
+          orderId: orderId,
           currency: 'HTG',
           metadata: { 
             order_ids: orderIds,
@@ -148,7 +155,7 @@ export default function Checkout() {
       }
 
       if (!resp.ok) {
-        const errorMsg = data.error || data.details || 'Failed to create payment'
+        const errorMsg = data.error || data.message || 'Failed to create payment'
         console.error('Payment API error:', errorMsg)
         toast({ 
           title: "Payment Failed", 
@@ -158,35 +165,25 @@ export default function Checkout() {
         return
       }
       
-      // Check if payment was successful
-      if (data.success === true || data.status === 'success') {
+      // Check if payment was created successfully
+      if (data.checkout_url) {
         // Clear cart if using cart mode
         if (paymentMode === "cart") {
           await clearCart()
         }
+        
         toast({ 
-          title: "Payment Success", 
-          description: "Payment completed successfully! Redirecting to payment page..." 
+          title: "Redirecting to Payment", 
+          description: "Redirecting to secure payment page..." 
         })
         
-        // Redirect to payment page if URL provided
-        if (data.payment_url) {
-          window.location.href = data.payment_url
-        } else {
-          navigate('/success')
-        }
-      } else if (data.payment_url || data.checkout_url || data.url) {
-        // Redirect to payment page if URL provided
-        toast({ 
-          title: "Redirecting", 
-          description: "Redirecting to payment page..." 
-        })
-        window.location.href = data.payment_url || data.checkout_url || data.url
+        // Redirect to Bazik checkout page
+        window.location.href = data.checkout_url
       } else {
-        console.error('Unexpected payment response structure:', data)
+        console.error('No checkout URL received:', data)
         toast({ 
           title: "Payment Error", 
-          description: "Unexpected response from payment server. Please try again.", 
+          description: "No payment URL received. Please try again.", 
           variant: "destructive" 
         })
       }

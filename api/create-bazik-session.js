@@ -1,7 +1,5 @@
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+// Vercel serverless function for creating Bazik MonCash payment sessions
+// File: /api/create-bazik-session.js
 
 // Token cache to avoid unnecessary authentication calls
 let tokenCache = {
@@ -60,53 +58,46 @@ async function getAccessToken() {
   }
 }
 
-exports.handler = async (event) => {
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Headers', 'authorization, x-client-info, apikey, content-type')
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+
   // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: corsHeaders }
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end()
   }
 
   // Only accept POST requests
-  if (event.httpMethod !== 'POST') {
-    return { 
-      statusCode: 405, 
-      body: JSON.stringify({ 
-        error: 'Method Not Allowed',
-        message: `Method ${event.httpMethod} not allowed. Only POST requests are accepted.`
-      }), 
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    }
+  if (req.method !== 'POST') {
+    return res.status(405).json({ 
+      error: 'Method Not Allowed',
+      message: `Method ${req.method} not allowed. Only POST requests are accepted.`
+    })
   }
 
   try {
     // Safely parse incoming JSON body
     let payload
     try {
-      payload = JSON.parse(event.body || '{}')
+      payload = req.body
     } catch (parseError) {
       console.error('JSON parse error:', parseError)
-      return { 
-        statusCode: 400, 
-        body: JSON.stringify({ 
-          error: 'Invalid JSON',
-          message: 'Request body must be valid JSON'
-        }), 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      return res.status(400).json({ 
+        error: 'Invalid JSON',
+        message: 'Request body must be valid JSON'
+      })
     }
 
     const { amount, orderId, currency = 'HTG', metadata = {} } = payload
 
     // Validate required fields
     if (!amount || amount <= 0) {
-      return { 
-        statusCode: 400, 
-        body: JSON.stringify({ 
-          error: 'Invalid amount',
-          message: 'Amount must be a positive number'
-        }), 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      return res.status(400).json({ 
+        error: 'Invalid amount',
+        message: 'Amount must be a positive number'
+      })
     }
 
     console.log('Creating Bazik MonCash payment for amount:', amount, 'orderId:', orderId)
@@ -127,7 +118,7 @@ exports.handler = async (event) => {
 
     console.log('MonCash request body:', requestBody)
 
-    const res = await fetch(`${apiBase}/moncash/payment`, {
+    const paymentRes = await fetch(`${apiBase}/moncash/payment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -136,8 +127,8 @@ exports.handler = async (event) => {
       body: JSON.stringify(requestBody)
     })
 
-    const responseText = await res.text()
-    console.log('Payment response status:', res.status)
+    const responseText = await paymentRes.text()
+    console.log('Payment response status:', paymentRes.status)
     console.log('Payment response body:', responseText)
 
     // Parse response safely
@@ -146,66 +137,46 @@ exports.handler = async (event) => {
       data = JSON.parse(responseText)
     } catch (jsonError) {
       console.error('Payment response JSON parse error:', jsonError)
-      return { 
-        statusCode: 500, 
-        body: JSON.stringify({ 
-          error: 'Invalid payment response',
-          message: 'Payment server returned invalid JSON response',
-          details: responseText.substring(0, 200)
-        }), 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      return res.status(500).json({ 
+        error: 'Invalid payment response',
+        message: 'Payment server returned invalid JSON response',
+        details: responseText.substring(0, 200)
+      })
     }
 
-    if (!res.ok) {
-      return { 
-        statusCode: res.status, 
-        body: JSON.stringify({ 
-          error: data.message || data.error || 'Payment creation failed',
-          message: 'Failed to create payment session',
-          details: data
-        }), 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+    if (!paymentRes.ok) {
+      return res.status(paymentRes.status).json({ 
+        error: data.message || data.error || 'Payment creation failed',
+        message: 'Failed to create payment session',
+        details: data
+      })
     }
 
     // Return success response with checkout URL
     const checkoutUrl = data.checkout_url || data.payment_url || data.url
     
     if (!checkoutUrl) {
-      return { 
-        statusCode: 500, 
-        body: JSON.stringify({ 
-          error: 'No checkout URL received',
-          message: 'Payment created but no checkout URL provided',
-          details: data
-        }), 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      return res.status(500).json({ 
+        error: 'No checkout URL received',
+        message: 'Payment created but no checkout URL provided',
+        details: data
+      })
     }
 
-    return { 
-      statusCode: 200, 
-      body: JSON.stringify({
-        checkout_url: checkoutUrl,
-        transaction_id: data.transaction_id || data.id,
-        amount: amount,
-        currency: currency,
-        order_id: orderId,
-        status: 'created'
-      }), 
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    }
+    return res.status(200).json({
+      checkout_url: checkoutUrl,
+      transaction_id: data.transaction_id || data.id,
+      amount: amount,
+      currency: currency,
+      order_id: orderId,
+      status: 'created'
+    })
 
   } catch (error) {
     console.error('Bazik payment error:', error)
-    return { 
-      statusCode: 500, 
-      body: JSON.stringify({ 
-        error: 'Payment processing failed',
-        message: error.message || 'Unknown error occurred during payment processing'
-      }), 
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    }
+    return res.status(500).json({ 
+      error: 'Payment processing failed',
+      message: error.message || 'Unknown error occurred during payment processing'
+    })
   }
 }
