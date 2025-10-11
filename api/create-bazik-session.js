@@ -1,6 +1,9 @@
 // Vercel serverless function for creating Bazik MonCash payment sessions
 // File: /api/create-bazik-session.js
 
+// Bazik API base URL - declared once for consistency
+const apiBase = 'https://api.bazik.io'
+
 // Token cache to avoid unnecessary authentication calls
 let tokenCache = {
   token: null,
@@ -19,9 +22,14 @@ async function getAccessToken() {
 
   console.log('Fetching new access token from Bazik...')
   
-  const clientId = 'bzk_d2f81d61_1759529138'
-  const clientSecret = 'sk_57fa74cbce0ea195c6b7dbb5b45d8cfc'
-  const apiBase = 'https://api.bazik.io'
+  // Get credentials from environment variables
+  const clientId = process.env.BAZIK_CLIENT_ID
+  const clientSecret = process.env.BAZIK_CLIENT_SECRET
+
+  // Validate that credentials are provided
+  if (!clientId || !clientSecret) {
+    throw new Error('Bazik credentials not configured. Please set BAZIK_CLIENT_ID and BAZIK_CLIENT_SECRET environment variables.')
+  }
 
   try {
     const authRes = await fetch(`${apiBase}/auth/token`, {
@@ -30,8 +38,8 @@ async function getAccessToken() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        userID: clientId,
-        secretKey: clientSecret
+        client_id: clientId,
+        client_secret: clientSecret
       })
     })
 
@@ -106,7 +114,6 @@ export default async function handler(req, res) {
     const accessToken = await getAccessToken()
 
     // Create MonCash payment
-    const apiBase = 'https://api.bazik.io'
     const requestBody = {
       gdes: amount,
       description: `Payment for Order ${orderId || 'Custom Payment'}`,
