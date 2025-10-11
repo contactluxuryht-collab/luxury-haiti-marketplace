@@ -82,17 +82,15 @@ export const handler: Handler = async (event) => {
     // Step 2: Create MonCash payment
     console.log('Step 2: Creating MonCash payment...')
     const requestBody = {
-      gdes: payload.amount,
-      description: `Payment for Order`,
-      referenceId: `BZK_sandbox_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      customerFirstName: payload.metadata?.firstName || 'Customer',
-      customerLastName: payload.metadata?.lastName || 'User',
-      customerEmail: payload.metadata?.email || 'customer@example.com'
+      amount: payload.amount,
+      orderId: `BZK_sandbox_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      successUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/success`,
+      errorUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/error`
     }
 
     console.log('MonCash request body:', requestBody)
 
-    const res = await fetch(`${apiBase}/moncash/token`, {
+    const res = await fetch(`${apiBase}/moncash/payment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

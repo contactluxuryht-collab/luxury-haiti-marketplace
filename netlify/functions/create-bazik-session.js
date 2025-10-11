@@ -115,12 +115,10 @@ exports.handler = async (event) => {
     // Create MonCash payment
     const apiBase = 'https://api.bazik.io'
     const requestBody = {
-      gdes: amount,
-      description: `Payment for Order ${orderId || 'Custom Payment'}`,
-      referenceId: orderId || `BZK_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      customerFirstName: metadata.firstName || 'Customer',
-      customerLastName: metadata.lastName || 'User',
-      customerEmail: metadata.email || 'customer@example.com'
+      amount: amount,
+      orderId: orderId || `BZK_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      successUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/success`,
+      errorUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/error`
     }
 
     console.log('MonCash request body:', requestBody)
@@ -167,15 +165,15 @@ exports.handler = async (event) => {
       }
     }
 
-    // Return success response with checkout URL
-    const checkoutUrl = data.checkout_url || data.payment_url || data.url
+    // Return success response with redirect URL
+    const redirectUrl = data.redirectUrl || data.checkout_url || data.payment_url || data.url
     
-    if (!checkoutUrl) {
+    if (!redirectUrl) {
       return { 
         statusCode: 500, 
         body: JSON.stringify({ 
-          error: 'No checkout URL received',
-          message: 'Payment created but no checkout URL provided',
+          error: 'No redirect URL received',
+          message: 'Payment created but no redirect URL provided',
           details: data
         }), 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -185,7 +183,8 @@ exports.handler = async (event) => {
     return { 
       statusCode: 200, 
       body: JSON.stringify({
-        checkout_url: checkoutUrl,
+        checkout_url: redirectUrl,  // Keep for frontend compatibility
+        redirect_url: redirectUrl,  // Add for clarity
         transaction_id: data.transaction_id || data.id,
         amount: amount,
         currency: currency,

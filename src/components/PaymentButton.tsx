@@ -70,8 +70,8 @@ export function PaymentButton({
       }
 
       // Check if we got a payment URL from Bazik
-      if (data.checkout_url || data.paymentUrl || data.payment_url || data.url) {
-        const paymentUrl = data.checkout_url || data.paymentUrl || data.payment_url || data.url
+      if (data.checkout_url || data.redirect_url || data.paymentUrl || data.payment_url || data.url) {
+        const paymentUrl = data.checkout_url || data.redirect_url || data.paymentUrl || data.payment_url || data.url
         console.log('Redirecting to Bazik payment page:', paymentUrl)
         
         // Redirect to Bazik payment page

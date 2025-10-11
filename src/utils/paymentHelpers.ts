@@ -113,7 +113,8 @@ export async function createPaymentSession(paymentData: {
 
     return {
       success: true,
-      checkout_url: data.checkout_url,
+      checkout_url: data.checkout_url || data.redirect_url,
+      redirect_url: data.redirect_url || data.checkout_url,
       transaction_id: data.transaction_id,
       amount: data.amount,
       currency: data.currency,

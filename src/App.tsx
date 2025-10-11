@@ -24,6 +24,7 @@ import Help from "./pages/Help";
 import About from "./pages/About";
 import Checkout from "./pages/Checkout";
 import Success from "./pages/Success";
+import Error from "./pages/Error";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,11 @@ const App = () => (
             <Route path="/success" element={
               <MainLayout>
                 <Success />
+              </MainLayout>
+            } />
+            <Route path="/error" element={
+              <MainLayout>
+                <Error />
               </MainLayout>
             } />
             <Route path="/privacy" element={

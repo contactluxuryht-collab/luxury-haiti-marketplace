@@ -166,7 +166,7 @@ export default function Checkout() {
       }
       
       // Check if payment was created successfully
-      if (data.checkout_url) {
+      if (data.checkout_url || data.redirect_url) {
         // Clear cart if using cart mode
         if (paymentMode === "cart") {
           await clearCart()
@@ -178,7 +178,7 @@ export default function Checkout() {
         })
         
         // Redirect to Bazik checkout page
-        window.location.href = data.checkout_url
+        window.location.href = data.checkout_url || data.redirect_url
       } else {
         console.error('No checkout URL received:', data)
         toast({ 
