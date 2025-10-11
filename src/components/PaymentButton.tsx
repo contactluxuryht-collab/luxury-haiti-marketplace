@@ -19,14 +19,14 @@ interface PaymentButtonProps {
 /**
  * PaymentButton Component
  * 
- * Integrates with Bazik MonCash payment via Netlify Functions
+ * Integrates with Bazik MonCash payment via Vercel API routes
  * 
  * Flow:
  * 1. User clicks "Pay with Bazik" button
- * 2. Calls /.netlify/functions/create-bazik-session
+ * 2. Calls /api/create-bazik-session
  * 3. Receives Bazik checkout URL
  * 4. Redirects user to Bazik payment page
- * 5. After payment, Bazik calls webhook (/.netlify/functions/bazik-webhook)
+ * 5. After payment, Bazik calls webhook (/api/payment-callback)
  * 6. Webhook updates order status in Supabase
  * 7. User returns to success page
  */
@@ -46,8 +46,8 @@ export function PaymentButton({
     try {
       console.log('Initiating Bazik payment for amount:', amount)
       
-      // Call Netlify Function to create Bazik payment session
-      const response = await fetch('/.netlify/functions/create-bazik-session', {
+      // Call Vercel API route to create Bazik payment session
+      const response = await fetch('/api/create-bazik-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
