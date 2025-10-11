@@ -40,9 +40,9 @@ export const handler: Handler = async (event) => {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${base64Credentials}`,
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({ grant_type: 'client_credentials' })
+      body: 'grant_type=client_credentials'
     })
 
     const authText = await authRes.text()
