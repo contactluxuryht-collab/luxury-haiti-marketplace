@@ -11,7 +11,7 @@ let tokenCache = {
 }
 
 // Helper function to get valid access token
-async function getAccessToken() {
+async function getAccessToken(clientId, clientSecret) {
   const now = Date.now()
   
   // Return cached token if still valid (with 5 minute buffer)
@@ -21,11 +21,6 @@ async function getAccessToken() {
   }
 
   console.log('Fetching new access token from Bazik...')
-  
-  // Get credentials from environment variables
-  const clientId = process.env.BAZIK_CLIENT_ID
-  const clientSecret = process.env.BAZIK_CLIENT_SECRET
-
   console.log('Environment check - Client ID exists:', !!clientId)
   console.log('Environment check - Client Secret exists:', !!clientSecret)
 
@@ -100,6 +95,18 @@ export default async function handler(req, res) {
     })
   }
 
+  // Get credentials from environment variables
+  const clientId = process.env.BAZIK_CLIENT_ID
+  const clientSecret = process.env.BAZIK_CLIENT_SECRET
+
+  // Validate that credentials are provided
+  if (!clientId || !clientSecret) {
+    return res.status(500).json({ 
+      error: 'Configuration Error',
+      message: 'Bazik credentials not configured. Please set BAZIK_CLIENT_ID and BAZIK_CLIENT_SECRET environment variables.'
+    })
+  }
+
   try {
     // Safely parse incoming JSON body
     let payload
@@ -131,7 +138,26 @@ export default async function handler(req, res) {
     console.log('Creating Bazik MonCash payment for amount:', amount, 'orderId:', orderId)
 
     // Get access token (with automatic refresh)
-    const accessToken = await getAccessToken()
+    let accessToken
+    try {
+      console.log('Attempting to get access token...')
+      accessToken = await getAccessToken(clientId, clientSecret)
+      console.log('Successfully obtained access token:', accessToken ? 'Token received' : 'No token')
+    } catch (authError) {
+      console.error('Failed to get access token:', authError)
+      return res.status(500).json({ 
+        error: 'Authentication failed',
+        message: `Failed to authenticate with Bazik: ${authError.message}`
+      })
+    }
+
+    if (!accessToken) {
+      console.error('No access token received from authentication')
+      return res.status(500).json({ 
+        error: 'Authentication failed',
+        message: 'No access token received from Bazik authentication'
+      })
+    }
 
     // Create MonCash payment
     const requestBody = {
@@ -149,19 +175,30 @@ export default async function handler(req, res) {
     }
 
     console.log('MonCash request body:', requestBody)
+    console.log('Making payment request to:', `${apiBase}/moncash/token`)
 
-    const paymentRes = await fetch(`${apiBase}/moncash/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(requestBody)
-    })
+    let paymentRes
+    let responseText
+    try {
+      paymentRes = await fetch(`${apiBase}/moncash/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(requestBody)
+      })
 
-    const responseText = await paymentRes.text()
-    console.log('Payment response status:', paymentRes.status)
-    console.log('Payment response body:', responseText)
+      responseText = await paymentRes.text()
+      console.log('Payment response status:', paymentRes.status)
+      console.log('Payment response body:', responseText)
+    } catch (fetchError) {
+      console.error('Payment request failed:', fetchError)
+      return res.status(500).json({ 
+        error: 'Payment request failed',
+        message: `Failed to create payment: ${fetchError.message}`
+      })
+    }
 
     // Parse response safely
     let data
