@@ -89,7 +89,12 @@ export default async function handler(req, res) {
     // Safely parse incoming JSON body
     let payload
     try {
-      payload = req.body
+      // Parse the request body if it's a string
+      if (typeof req.body === 'string') {
+        payload = JSON.parse(req.body)
+      } else {
+        payload = req.body
+      }
     } catch (parseError) {
       console.error('JSON parse error:', parseError)
       return res.status(400).json({ 
