@@ -32,17 +32,17 @@ export const handler: Handler = async (event) => {
     console.log('Using credentials:', { userID: userId, secretKey: '***' })
     
   try {
-    // Create Basic Auth header
-    const credentials = `${userId}:${secretKey}`
-    const base64Credentials = Buffer.from(credentials).toString('base64')
+    const authRequest = {
+      userID: userId,
+      secretKey: secretKey
+    }
     
     const authRes = await fetch(`${apiBase}/token`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${base64Credentials}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: 'grant_type=client_credentials'
+      body: JSON.stringify(authRequest)
     })
 
     const authText = await authRes.text()

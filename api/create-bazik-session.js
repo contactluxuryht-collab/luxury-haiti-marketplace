@@ -30,20 +30,20 @@ async function getAccessToken(clientId, clientSecret) {
   }
 
   try {
-    // Create Basic Auth header
-    const credentials = `${clientId}:${clientSecret}`
-    const base64Credentials = Buffer.from(credentials).toString('base64')
+    const authRequest = {
+      userID: clientId,
+      secretKey: clientSecret
+    }
     
     console.log('Sending authentication request to:', `${apiBase}/token`)
-    console.log('Using Basic Auth with client ID:', clientId)
+    console.log('Using userID/secretKey format with client ID:', clientId)
     
     const authRes = await fetch(`${apiBase}/token`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${base64Credentials}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: 'grant_type=client_credentials'
+      body: JSON.stringify(authRequest)
     })
 
     console.log('Authentication response status:', authRes.status)
@@ -58,17 +58,17 @@ async function getAccessToken(clientId, clientSecret) {
     
     console.log('Authentication response:', authData)
     
-    if (!authData.access_token) {
-      console.error('No access_token in response:', authData)
+    if (!authData.token) {
+      console.error('No token in response:', authData)
       throw new Error('No access token received from authentication')
     }
 
     // Cache the token with expiration time
-    tokenCache.token = authData.access_token
-    tokenCache.expiresAt = now + (authData.expires_in * 1000) || (now + 3600000) // Default 1 hour
+    tokenCache.token = authData.token
+    tokenCache.expiresAt = authData.expires_at || (now + 3600000) // Default 1 hour if no expiration
 
     console.log('Successfully obtained access token')
-    return authData.access_token
+    return authData.token
 
   } catch (error) {
     console.error('Token fetch error:', error)
