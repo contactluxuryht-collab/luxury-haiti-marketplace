@@ -23,7 +23,7 @@ async function getAccessToken() {
   
   const clientId = 'bzk_d2f81d61_1759529138'
   const clientSecret = 'sk_57fa74cbce0ea195c6b7dbb5b45d8cfc'
-  const apiBase = 'https://api.bazik.io'
+  const apiBase = 'https://bazik.io/api'
 
   try {
     const authRes = await fetch(`${apiBase}/auth/token`, {
@@ -113,7 +113,7 @@ exports.handler = async (event) => {
     const accessToken = await getAccessToken()
 
     // Create MonCash payment
-    const apiBase = 'https://api.bazik.io'
+    const apiBase = 'https://bazik.io/api'
     const requestBody = {
       amount: amount,
       orderId: orderId || `BZK_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

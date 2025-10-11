@@ -17,7 +17,7 @@ export const handler: Handler = async (event) => {
   try {
     const userId = 'bzk_d2f81d61_1759529138'
     const secretKey = 'sk_57fa74cbce0ea195c6b7dbb5b45d8cfc'
-    const apiBase = 'https://api.bazik.io'
+    const apiBase = 'https://bazik.io/api'
 
     const payload = JSON.parse(event.body || '{}') as {
       amount: number

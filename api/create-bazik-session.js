@@ -2,7 +2,7 @@
 // File: /api/create-bazik-session.js
 
 // Bazik API base URL - declared once for consistency
-const apiBase = 'https://api.bazik.io'
+const apiBase = 'https://bazik.io/api'
 
 // Token cache to avoid unnecessary authentication calls
 let tokenCache = {
