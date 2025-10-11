@@ -17,7 +17,7 @@ export const handler: Handler = async (event) => {
   try {
     const userId = 'bzk_d2f81d61_1759529138'
     const secretKey = 'sk_57fa74cbce0ea195c6b7dbb5b45d8cfc'
-    const apiBase = 'https://bazik.io/api'
+    const apiBase = 'https://api.bazik.io'
 
     const payload = JSON.parse(event.body || '{}') as {
       amount: number
@@ -31,13 +31,15 @@ export const handler: Handler = async (event) => {
     console.log('Step 1: Authenticating with Bazik...')
     console.log('Using credentials:', { userID: userId, secretKey: '***' })
     
-    const authRes = await fetch(`${apiBase}/auth/token`, {
+    const authRes = await fetch(`${apiBase}/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${userId}:${secretKey}`).toString('base64')}`
+        'Content-Type': 'application/json',
       },
-      body: 'scope=SERVER_ACCESS'
+      body: JSON.stringify({
+        userID: userId,
+        secretKey: secretKey
+      })
     })
 
     const authText = await authRes.text()
@@ -82,15 +84,22 @@ export const handler: Handler = async (event) => {
     // Step 2: Create MonCash payment
     console.log('Step 2: Creating MonCash payment...')
     const requestBody = {
-      amount: payload.amount,
-      orderId: `BZK_sandbox_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      gdes: payload.amount,
+      userID: userId,
       successUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/success`,
-      errorUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/error`
+      description: `Payment for Order`,
+      referenceId: `BZK_sandbox_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      errorUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/error`,
+      customerFirstName: payload.metadata?.firstName || 'Customer',
+      customerLastName: payload.metadata?.lastName || 'User',
+      customerEmail: payload.metadata?.email || 'customer@example.com',
+      webhookUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/api/payment-callback`,
+      metadata: payload.metadata || {}
     }
 
     console.log('MonCash request body:', requestBody)
 
-    const res = await fetch(`${apiBase}/moncash/payment`, {
+    const res = await fetch(`${apiBase}/moncash/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

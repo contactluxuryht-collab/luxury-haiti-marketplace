@@ -2,7 +2,7 @@
 // File: /api/create-bazik-session.js
 
 // Bazik API base URL - declared once for consistency
-const apiBase = 'https://bazik.io/api'
+const apiBase = 'https://api.bazik.io'
 
 // Token cache to avoid unnecessary authentication calls
 let tokenCache = {
@@ -32,13 +32,15 @@ async function getAccessToken() {
   }
 
   try {
-    const authRes = await fetch(`${apiBase}/auth/token`, {
+    const authRes = await fetch(`${apiBase}/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
+        'Content-Type': 'application/json',
       },
-      body: 'scope=SERVER_ACCESS'
+      body: JSON.stringify({
+        userID: clientId,
+        secretKey: clientSecret
+      })
     })
 
     if (!authRes.ok) {
@@ -118,15 +120,22 @@ export default async function handler(req, res) {
 
     // Create MonCash payment
     const requestBody = {
-      amount: amount,
-      orderId: orderId || `BZK_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      gdes: amount,
+      userID: clientId,
       successUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/success`,
-      errorUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/error`
+      description: `Payment for Order ${orderId || 'Custom Payment'}`,
+      referenceId: orderId || `BZK_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      errorUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/error`,
+      customerFirstName: metadata.firstName || 'Customer',
+      customerLastName: metadata.lastName || 'User',
+      customerEmail: metadata.email || 'customer@example.com',
+      webhookUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.luxuryhaiti.com'}/api/payment-callback`,
+      metadata: metadata
     }
 
     console.log('MonCash request body:', requestBody)
 
-    const paymentRes = await fetch(`${apiBase}/moncash/payment`, {
+    const paymentRes = await fetch(`${apiBase}/moncash/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

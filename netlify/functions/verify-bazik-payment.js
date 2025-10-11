@@ -23,16 +23,18 @@ async function getAccessToken() {
   
   const clientId = 'bzk_d2f81d61_1759529138'
   const clientSecret = 'sk_57fa74cbce0ea195c6b7dbb5b45d8cfc'
-  const apiBase = 'https://bazik.io/api'
+  const apiBase = 'https://api.bazik.io'
 
   try {
-    const authRes = await fetch(`${apiBase}/auth/token`, {
+    const authRes = await fetch(`${apiBase}/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
+        'Content-Type': 'application/json',
       },
-      body: 'scope=SERVER_ACCESS'
+      body: JSON.stringify({
+        userID: clientId,
+        secretKey: clientSecret
+      })
     })
 
     if (!authRes.ok) {
@@ -97,7 +99,7 @@ exports.handler = async (event) => {
     const accessToken = await getAccessToken()
 
     // Verify payment with Bazik
-    const apiBase = 'https://bazik.io/api'
+    const apiBase = 'https://api.bazik.io'
     const res = await fetch(`${apiBase}/moncash/payment/verify/${orderId}`, {
       method: 'GET',
       headers: {
