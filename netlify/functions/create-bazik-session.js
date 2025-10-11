@@ -29,12 +29,10 @@ async function getAccessToken() {
     const authRes = await fetch(`${apiBase}/auth/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
       },
-      body: JSON.stringify({
-        userID: clientId,
-        secretKey: clientSecret
-      })
+      body: 'scope=SERVER_ACCESS'
     })
 
     if (!authRes.ok) {

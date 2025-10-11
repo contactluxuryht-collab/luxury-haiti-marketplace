@@ -34,12 +34,10 @@ export const handler: Handler = async (event) => {
     const authRes = await fetch(`${apiBase}/auth/token`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${Buffer.from(`${userId}:${secretKey}`).toString('base64')}`
       },
-      body: JSON.stringify({
-        userID: userId,
-        secretKey: secretKey
-      })
+      body: 'scope=SERVER_ACCESS'
     })
 
     const authText = await authRes.text()
