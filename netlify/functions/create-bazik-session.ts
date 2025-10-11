@@ -31,15 +31,18 @@ export const handler: Handler = async (event) => {
     console.log('Step 1: Authenticating with Bazik...')
     console.log('Using credentials:', { userID: userId, secretKey: '***' })
     
+  try {
+    // Create Basic Auth header
+    const credentials = `${userId}:${secretKey}`
+    const base64Credentials = Buffer.from(credentials).toString('base64')
+    
     const authRes = await fetch(`${apiBase}/token`, {
       method: 'POST',
       headers: {
+        'Authorization': `Basic ${base64Credentials}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        userID: userId,
-        secretKey: secretKey
-      })
+      body: JSON.stringify({ grant_type: 'client_credentials' })
     })
 
     const authText = await authRes.text()

@@ -19,20 +19,26 @@ async function getAccessToken() {
 
   console.log('Fetching new access token from Bazik...')
   
-  const clientId = 'bzk_d2f81d61_1759529138'
-  const clientSecret = 'sk_57fa74cbce0ea195c6b7dbb5b45d8cfc'
+  const clientId = process.env.BAZIK_CLIENT_ID
+  const clientSecret = process.env.BAZIK_CLIENT_SECRET
   const apiBase = 'https://api.bazik.io'
+  
+  if (!clientId || !clientSecret) {
+    throw new Error('Bazik credentials not configured. Please set BAZIK_CLIENT_ID and BAZIK_CLIENT_SECRET environment variables.')
+  }
 
   try {
+    // Create Basic Auth header
+    const credentials = `${clientId}:${clientSecret}`
+    const base64Credentials = Buffer.from(credentials).toString('base64')
+    
     const authRes = await fetch(`${apiBase}/token`, {
       method: 'POST',
       headers: {
+        'Authorization': `Basic ${base64Credentials}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        userID: clientId,
-        secretKey: clientSecret
-      })
+      body: JSON.stringify({ grant_type: 'client_credentials' })
     })
 
     if (!authRes.ok) {

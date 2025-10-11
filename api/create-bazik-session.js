@@ -26,30 +26,45 @@ async function getAccessToken() {
   const clientId = process.env.BAZIK_CLIENT_ID
   const clientSecret = process.env.BAZIK_CLIENT_SECRET
 
+  console.log('Environment check - Client ID exists:', !!clientId)
+  console.log('Environment check - Client Secret exists:', !!clientSecret)
+
   // Validate that credentials are provided
   if (!clientId || !clientSecret) {
     throw new Error('Bazik credentials not configured. Please set BAZIK_CLIENT_ID and BAZIK_CLIENT_SECRET environment variables.')
   }
 
   try {
+    // Create Basic Auth header
+    const credentials = `${clientId}:${clientSecret}`
+    const base64Credentials = Buffer.from(credentials).toString('base64')
+    
+    console.log('Sending authentication request to:', `${apiBase}/token`)
+    console.log('Using Basic Auth with client ID:', clientId)
+    
     const authRes = await fetch(`${apiBase}/token`, {
       method: 'POST',
       headers: {
+        'Authorization': `Basic ${base64Credentials}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        userID: clientId,
-        secretKey: clientSecret
-      })
+      body: JSON.stringify({ grant_type: 'client_credentials' })
     })
 
+    console.log('Authentication response status:', authRes.status)
+    
     if (!authRes.ok) {
+      const errorText = await authRes.text()
+      console.error('Authentication failed. Status:', authRes.status, 'Response:', errorText)
       throw new Error(`Authentication failed with status: ${authRes.status}`)
     }
 
     const authData = await authRes.json()
     
+    console.log('Authentication response:', authData)
+    
     if (!authData.access_token) {
+      console.error('No access_token in response:', authData)
       throw new Error('No access token received from authentication')
     }
 
