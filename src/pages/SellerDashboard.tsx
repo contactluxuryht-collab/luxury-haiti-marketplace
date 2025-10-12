@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Plus, Package, DollarSign, ShoppingCart, Edit, Trash2, Upload, X, CheckCircle, XCircle, AlertCircle } from "lucide-react"
+import { Loader2, Plus, Package, DollarSign, ShoppingCart, Edit, Trash2, Upload, X, CheckCircle, XCircle, AlertCircle, Truck, MapPin, Clock, User, Phone, Mail, Eye, RefreshCw } from "lucide-react"
 import { useProducts } from "@/hooks/useProducts"
 import { useCategories } from "@/hooks/useCategories"
 
@@ -24,6 +24,33 @@ interface Product {
   category_id: string | null
   seller_id: string
   created_at: string
+  delivery_available?: boolean
+  delivery_price?: number
+}
+
+interface Order {
+  id: string
+  buyer_id: string
+  seller_id: string
+  product_id: string
+  quantity: number
+  price_per_unit: number
+  total_amount: number
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  shipping_address: any
+  payment_method?: string
+  payment_status?: string
+  notes?: string
+  created_at: string
+  updated_at: string
+  product?: Product
+  buyer?: {
+    name: string
+    email: string
+    phone_number?: string
+  }
+  delivery_option?: 'pickup' | 'delivery'
+  delivery_fee?: number
 }
 
 export default function SellerDashboard() {
@@ -51,6 +78,8 @@ export default function SellerDashboard() {
     size: "",
     weight: "",
     image_url: "",
+    delivery_available: false,
+    delivery_price: "",
   })
   const [newColor, setNewColor] = useState("")
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -63,6 +92,11 @@ export default function SellerDashboard() {
     totalOrders: 0
   })
   const [sellerApproved, setSellerApproved] = useState<boolean | null>(null)
+  const [orders, setOrders] = useState<Order[]>([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [orderDetailsOpen, setOrderDetailsOpen] = useState(false)
+  const [updatingOrder, setUpdatingOrder] = useState(false)
   const { toast } = useToast()
 
   // Edit product state
@@ -75,6 +109,8 @@ export default function SellerDashboard() {
     price: "",
     category_id: "",
     image_url: "",
+    delivery_available: false,
+    delivery_price: "",
   })
   const [editSelectedFile, setEditSelectedFile] = useState<File | null>(null)
   const [editPreviewUrl, setEditPreviewUrl] = useState<string | null>(null)
@@ -417,6 +453,8 @@ Détails du produit:
             colors: newProduct.colors.length ? newProduct.colors : null,
             size: newProduct.size || null,
             weight: isNaN(weightNumber) ? null : weightNumber,
+            delivery_available: newProduct.delivery_available,
+            delivery_price: newProduct.delivery_available && newProduct.delivery_price ? parseFloat(newProduct.delivery_price) : null,
           },
         ])
         .select('id')
@@ -549,6 +587,126 @@ Détails du produit:
       toast({ title: 'Suppression échouée', description: e?.message || 'Erreur inconnue', variant: 'destructive' })
     }
   }
+
+  // Order Management Functions
+  const fetchOrders = async () => {
+    if (!user) return
+    setOrdersLoading(true)
+    try {
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', user.id)
+        .single()
+
+      if (userError) throw userError
+
+      const { data: orders, error: ordersError } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          product:products(*),
+          buyer:users!orders_buyer_id_fkey(name, email, phone_number)
+        `)
+        .eq('seller_id', userData.id)
+        .order('created_at', { ascending: false })
+
+      if (ordersError) throw ordersError
+
+      setOrders(orders || [])
+    } catch (error) {
+      console.error('Error fetching orders:', error)
+      toast({ title: 'Erreur', description: 'Impossible de charger les commandes', variant: 'destructive' })
+    } finally {
+      setOrdersLoading(false)
+    }
+  }
+
+  const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
+    if (!user) return
+    setUpdatingOrder(true)
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', orderId)
+
+      if (error) throw error
+
+      // Update local state
+      setOrders(prev => prev.map(order => 
+        order.id === orderId ? { ...order, status: newStatus } : order
+      ))
+
+      // Update stats
+      await fetchStats()
+
+      toast({ 
+        title: 'Statut mis à jour', 
+        description: `La commande est maintenant ${getStatusLabel(newStatus)}` 
+      })
+    } catch (error) {
+      console.error('Error updating order status:', error)
+      toast({ title: 'Erreur', description: 'Impossible de mettre à jour le statut', variant: 'destructive' })
+    } finally {
+      setUpdatingOrder(false)
+    }
+  }
+
+  const getStatusLabel = (status: Order['status']) => {
+    const labels = {
+      pending: 'En attente',
+      processing: 'En cours de traitement',
+      shipped: 'Expédiée',
+      delivered: 'Livrée',
+      cancelled: 'Annulée'
+    }
+    return labels[status] || status
+  }
+
+  const getStatusColor = (status: Order['status']) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      processing: 'bg-blue-100 text-blue-800',
+      shipped: 'bg-purple-100 text-purple-800',
+      delivered: 'bg-green-100 text-green-800',
+      cancelled: 'bg-red-100 text-red-800'
+    }
+    return colors[status] || 'bg-gray-100 text-gray-800'
+  }
+
+  const getNextStatus = (currentStatus: Order['status']): Order['status'] | null => {
+    const statusFlow = {
+      pending: 'processing' as Order['status'],
+      processing: 'shipped' as Order['status'],
+      shipped: 'delivered' as Order['status'],
+      delivered: null,
+      cancelled: null
+    }
+    return statusFlow[currentStatus] || null
+  }
+
+  const getStatusIcon = (status: Order['status']) => {
+    const icons = {
+      pending: Clock,
+      processing: RefreshCw,
+      shipped: Truck,
+      delivered: CheckCircle,
+      cancelled: XCircle
+    }
+    const Icon = icons[status] || Clock
+    return <Icon className="h-4 w-4" />
+  }
+
+  // Load orders when component mounts
+  useEffect(() => {
+    if (user && sellerApproved === true) {
+      fetchOrders()
+    }
+  }, [user, sellerApproved])
 
   if (authLoading || productsLoading) {
     return (
@@ -725,6 +883,255 @@ Détails du produit:
         </Card>
       )}
 
+      {/* Order Management Section */}
+      {sellerApproved === true && (
+        <Card className="border-border/50">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Gestion des commandes
+                </CardTitle>
+                <CardDescription>Suivez et gérez les commandes de vos produits</CardDescription>
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={fetchOrders}
+                disabled={ordersLoading}
+              >
+                {ordersLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                )}
+                Actualiser
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {ordersLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="ml-2">Chargement des commandes...</span>
+              </div>
+            ) : orders.length === 0 ? (
+              <div className="text-center py-8">
+                <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-muted-foreground">Aucune commande</h3>
+                <p className="text-sm text-muted-foreground">Vous n'avez pas encore de commandes.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {orders.map((order) => (
+                  <div key={order.id} className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Badge className={getStatusColor(order.status)}>
+                            {getStatusIcon(order.status)}
+                            <span className="ml-1">{getStatusLabel(order.status)}</span>
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">
+                            #{order.id.slice(0, 8)}
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h4 className="font-medium">{order.product?.title}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Quantité: {order.quantity} × ${order.price_per_unit}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Total: ${order.total_amount}
+                            </p>
+                            {order.delivery_option === 'delivery' && order.delivery_fee && (
+                              <p className="text-sm text-muted-foreground">
+                                Livraison: +${order.delivery_fee}
+                              </p>
+                            )}
+                          </div>
+                          
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <User className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">{order.buyer?.name || 'Client'}</span>
+                            </div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <Mail className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">{order.buyer?.email}</span>
+                            </div>
+                            {order.buyer?.phone_number && (
+                              <div className="flex items-center gap-2">
+                                <Phone className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground">{order.buyer.phone_number}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {order.shipping_address && (
+                          <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                            <div className="flex items-start gap-2">
+                              <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                              <div>
+                                <p className="text-sm font-medium">Adresse de livraison:</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {typeof order.shipping_address === 'string' 
+                                    ? order.shipping_address 
+                                    : `${order.shipping_address.address || ''} ${order.shipping_address.city || ''} ${order.shipping_address.postalCode || ''}`.trim()
+                                  }
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between mt-3">
+                          <span className="text-xs text-muted-foreground">
+                            Commandé le {new Date(order.created_at).toLocaleDateString('fr-FR')}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedOrder(order)
+                                setOrderDetailsOpen(true)
+                              }}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Détails
+                            </Button>
+                            {getNextStatus(order.status) && (
+                              <Button
+                                size="sm"
+                                onClick={() => updateOrderStatus(order.id, getNextStatus(order.status)!)}
+                                disabled={updatingOrder}
+                              >
+                                {updatingOrder ? (
+                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                ) : (
+                                  getStatusIcon(getNextStatus(order.status)!)
+                                )}
+                                <span className="ml-1">
+                                  {getNextStatus(order.status) === 'processing' && 'Traiter'}
+                                  {getNextStatus(order.status) === 'shipped' && 'Expédier'}
+                                  {getNextStatus(order.status) === 'delivered' && 'Marquer livré'}
+                                </span>
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Order Details Dialog */}
+      <Dialog open={orderDetailsOpen} onOpenChange={setOrderDetailsOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Détails de la commande</DialogTitle>
+            <DialogDescription>
+              Commande #{selectedOrder?.id.slice(0, 8)}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-medium mb-3">Informations produit</h4>
+                  <div className="space-y-2">
+                    <p><span className="font-medium">Produit:</span> {selectedOrder.product?.title}</p>
+                    <p><span className="font-medium">Quantité:</span> {selectedOrder.quantity}</p>
+                    <p><span className="font-medium">Prix unitaire:</span> ${selectedOrder.price_per_unit}</p>
+                    <p><span className="font-medium">Total:</span> ${selectedOrder.total_amount}</p>
+                    {selectedOrder.delivery_option === 'delivery' && selectedOrder.delivery_fee && (
+                      <p><span className="font-medium">Frais de livraison:</span> +${selectedOrder.delivery_fee}</p>
+                    )}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-3">Informations client</h4>
+                  <div className="space-y-2">
+                    <p><span className="font-medium">Nom:</span> {selectedOrder.buyer?.name || 'Non fourni'}</p>
+                    <p><span className="font-medium">Email:</span> {selectedOrder.buyer?.email}</p>
+                    <p><span className="font-medium">Téléphone:</span> {selectedOrder.buyer?.phone_number || 'Non fourni'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {selectedOrder.shipping_address && (
+                <div>
+                  <h4 className="font-medium mb-3">Adresse de livraison</h4>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-sm">
+                      {typeof selectedOrder.shipping_address === 'string' 
+                        ? selectedOrder.shipping_address 
+                        : `${selectedOrder.shipping_address.address || ''} ${selectedOrder.shipping_address.city || ''} ${selectedOrder.shipping_address.postalCode || ''}`.trim()
+                      }
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <h4 className="font-medium mb-3">Statut de la commande</h4>
+                <div className="flex items-center gap-2">
+                  <Badge className={getStatusColor(selectedOrder.status)}>
+                    {getStatusIcon(selectedOrder.status)}
+                    <span className="ml-1">{getStatusLabel(selectedOrder.status)}</span>
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    Commandé le {new Date(selectedOrder.created_at).toLocaleDateString('fr-FR')}
+                  </span>
+                </div>
+              </div>
+
+              {selectedOrder.notes && (
+                <div>
+                  <h4 className="font-medium mb-3">Notes</h4>
+                  <p className="text-sm text-muted-foreground">{selectedOrder.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOrderDetailsOpen(false)}>
+              Fermer
+            </Button>
+            {selectedOrder && getNextStatus(selectedOrder.status) && (
+              <Button
+                onClick={() => {
+                  updateOrderStatus(selectedOrder.id, getNextStatus(selectedOrder.status)!)
+                  setOrderDetailsOpen(false)
+                }}
+                disabled={updatingOrder}
+              >
+                {updatingOrder ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  getStatusIcon(getNextStatus(selectedOrder.status)!)
+                )}
+                <span className="ml-1">
+                  {getNextStatus(selectedOrder.status) === 'processing' && 'Traiter la commande'}
+                  {getNextStatus(selectedOrder.status) === 'shipped' && 'Marquer comme expédiée'}
+                  {getNextStatus(selectedOrder.status) === 'delivered' && 'Marquer comme livrée'}
+                </span>
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Products Section */}
       <Card className="border-border/50">
         <CardHeader>
@@ -893,6 +1300,46 @@ Détails du produit:
               </div>
             </div>
 
+            {/* Delivery Options */}
+            <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+              <div className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-primary" />
+                <h4 className="font-medium">Options de livraison</h4>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="delivery-available"
+                    checked={newProduct.delivery_available}
+                    onChange={(e) => setNewProduct({ ...newProduct, delivery_available: e.target.checked })}
+                    className="rounded border-border"
+                  />
+                  <Label htmlFor="delivery-available" className="text-sm font-medium">
+                    Proposer la livraison pour ce produit
+                  </Label>
+                </div>
+                
+                {newProduct.delivery_available && (
+                  <div className="space-y-2">
+                    <Label htmlFor="delivery-price">Prix de livraison (USD)</Label>
+                    <Input
+                      id="delivery-price"
+                      type="number"
+                      step="0.01"
+                      value={newProduct.delivery_price}
+                      onChange={(e) => setNewProduct({ ...newProduct, delivery_price: e.target.value })}
+                      placeholder="0.00"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Les clients pourront choisir entre retrait sur place (gratuit) ou livraison (frais supplémentaires)
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label>Images du produit</Label>
               <div className="space-y-2">
@@ -990,6 +1437,47 @@ Détails du produit:
                 </Select>
               </div>
             </div>
+
+            {/* Delivery Options for Edit */}
+            <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+              <div className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-primary" />
+                <h4 className="font-medium">Options de livraison</h4>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="edit-delivery-available"
+                    checked={editProduct.delivery_available}
+                    onChange={(e) => setEditProduct({ ...editProduct, delivery_available: e.target.checked })}
+                    className="rounded border-border"
+                  />
+                  <Label htmlFor="edit-delivery-available" className="text-sm font-medium">
+                    Proposer la livraison pour ce produit
+                  </Label>
+                </div>
+                
+                {editProduct.delivery_available && (
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-delivery-price">Prix de livraison (USD)</Label>
+                    <Input
+                      id="edit-delivery-price"
+                      type="number"
+                      step="0.01"
+                      value={editProduct.delivery_price}
+                      onChange={(e) => setEditProduct({ ...editProduct, delivery_price: e.target.value })}
+                      placeholder="0.00"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Les clients pourront choisir entre retrait sur place (gratuit) ou livraison (frais supplémentaires)
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label>Image principale</Label>
               <div className="space-y-2">

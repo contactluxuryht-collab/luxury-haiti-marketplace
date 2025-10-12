@@ -166,6 +166,7 @@ export default function AdminDashboard() {
     status: "healthy",
     size: "0 MB"
   })
+  const [activeDashboardSection, setActiveDashboardSection] = useState<string | null>(null)
   const isAdmin = useMemo(() => (user?.user_metadata as any)?.role === 'admin', [user])
 
   useEffect(() => {
@@ -879,7 +880,10 @@ export default function AdminDashboard() {
         <TabsContent value="overview" className="space-y-6">
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="border-border/50 hover:shadow-lg transition-shadow cursor-pointer">
+            <Card 
+              className={`border-border/50 hover:shadow-lg transition-shadow cursor-pointer ${activeDashboardSection === 'notifications' ? 'ring-2 ring-blue-500' : ''}`}
+              onClick={() => setActiveDashboardSection(activeDashboardSection === 'notifications' ? null : 'notifications')}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -893,7 +897,10 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 hover:shadow-lg transition-shadow cursor-pointer">
+            <Card 
+              className={`border-border/50 hover:shadow-lg transition-shadow cursor-pointer ${activeDashboardSection === 'analytics' ? 'ring-2 ring-green-500' : ''}`}
+              onClick={() => setActiveDashboardSection(activeDashboardSection === 'analytics' ? null : 'analytics')}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -907,7 +914,10 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 hover:shadow-lg transition-shadow cursor-pointer">
+            <Card 
+              className={`border-border/50 hover:shadow-lg transition-shadow cursor-pointer ${activeDashboardSection === 'backup' ? 'ring-2 ring-purple-500' : ''}`}
+              onClick={() => setActiveDashboardSection(activeDashboardSection === 'backup' ? null : 'backup')}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -921,7 +931,10 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 hover:shadow-lg transition-shadow cursor-pointer">
+            <Card 
+              className={`border-border/50 hover:shadow-lg transition-shadow cursor-pointer ${activeDashboardSection === 'configuration' ? 'ring-2 ring-orange-500' : ''}`}
+              onClick={() => setActiveDashboardSection(activeDashboardSection === 'configuration' ? null : 'configuration')}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -935,6 +948,358 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Dynamic Dashboard Sections */}
+          {activeDashboardSection === 'notifications' && (
+            <Card className="border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  Notifications
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {notifications.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">Aucune notification</p>
+                  ) : (
+                    notifications.map((notification) => (
+                      <div 
+                        key={notification.id} 
+                        className={`p-4 rounded-lg border ${notification.read ? 'bg-muted/50' : 'bg-blue-50 border-blue-200'}`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-medium">{notification.title}</h4>
+                            <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              {new Date(notification.created_at).toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {!notification.read && (
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                                Non lue
+                              </Badge>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setNotifications(prev => 
+                                  prev.map(n => n.id === notification.id ? {...n, read: true} : n)
+                                )
+                              }}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeDashboardSection === 'analytics' && (
+            <Card className="border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Analytics et Rapports
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-green-600" />
+                      <span className="font-medium">Ventes du mois</span>
+                    </div>
+                    <p className="text-2xl font-bold text-green-600 mt-2">$12,450</p>
+                    <p className="text-sm text-green-600">+15% vs mois dernier</p>
+                  </div>
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-blue-600" />
+                      <span className="font-medium">Utilisateurs actifs</span>
+                    </div>
+                    <p className="text-2xl font-bold text-blue-600 mt-2">1,234</p>
+                    <p className="text-sm text-blue-600">+8% vs mois dernier</p>
+                  </div>
+                  <div className="p-4 bg-purple-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-5 w-5 text-purple-600" />
+                      <span className="font-medium">Produits vendus</span>
+                    </div>
+                    <p className="text-2xl font-bold text-purple-600 mt-2">456</p>
+                    <p className="text-sm text-purple-600">+22% vs mois dernier</p>
+                  </div>
+                  <div className="p-4 bg-orange-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <ShoppingCart className="h-5 w-5 text-orange-600" />
+                      <span className="font-medium">Commandes</span>
+                    </div>
+                    <p className="text-2xl font-bold text-orange-600 mt-2">89</p>
+                    <p className="text-sm text-orange-600">+12% vs mois dernier</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h4 className="font-medium">Rapports disponibles</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button variant="outline" className="h-auto p-4 justify-start">
+                      <FileText className="h-4 w-4 mr-2" />
+                      <div className="text-left">
+                        <div className="font-medium">Rapport de ventes</div>
+                        <div className="text-sm text-muted-foreground">Analyse des ventes par période</div>
+                      </div>
+                    </Button>
+                    <Button variant="outline" className="h-auto p-4 justify-start">
+                      <Users className="h-4 w-4 mr-2" />
+                      <div className="text-left">
+                        <div className="font-medium">Rapport utilisateurs</div>
+                        <div className="text-sm text-muted-foreground">Analyse des utilisateurs actifs</div>
+                      </div>
+                    </Button>
+                    <Button variant="outline" className="h-auto p-4 justify-start">
+                      <Package className="h-4 w-4 mr-2" />
+                      <div className="text-left">
+                        <div className="font-medium">Rapport produits</div>
+                        <div className="text-sm text-muted-foreground">Performance des produits</div>
+                      </div>
+                    </Button>
+                    <Button variant="outline" className="h-auto p-4 justify-start">
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      <div className="text-left">
+                        <div className="font-medium">Rapport financier</div>
+                        <div className="text-sm text-muted-foreground">Analyse des revenus</div>
+                      </div>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeDashboardSection === 'backup' && (
+            <Card className="border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5" />
+                  Sauvegarde et Maintenance
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 bg-green-50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Database className="h-5 w-5 text-green-600" />
+                        <span className="font-medium">Statut</span>
+                      </div>
+                      <p className="text-lg font-bold text-green-600">{backupStatus.status}</p>
+                      <p className="text-sm text-muted-foreground">Système opérationnel</p>
+                    </div>
+                    <div className="p-4 bg-blue-50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Clock className="h-5 w-5 text-blue-600" />
+                        <span className="font-medium">Dernière sauvegarde</span>
+                      </div>
+                      <p className="text-lg font-bold text-blue-600">
+                        {backupStatus.lastBackup ? new Date(backupStatus.lastBackup).toLocaleDateString() : 'Jamais'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Taille: {backupStatus.size}</p>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calendar className="h-5 w-5 text-purple-600" />
+                        <span className="font-medium">Prochaine sauvegarde</span>
+                      </div>
+                      <p className="text-lg font-bold text-purple-600">
+                        {backupStatus.nextBackup ? new Date(backupStatus.nextBackup).toLocaleDateString() : 'Non planifiée'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Automatique</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Actions de sauvegarde</h4>
+                    <div className="flex flex-wrap gap-2">
+                      <Button onClick={() => {
+                        setBackupStatus(prev => ({...prev, status: 'backing_up'}))
+                        setTimeout(() => {
+                          setBackupStatus(prev => ({
+                            ...prev, 
+                            status: 'healthy',
+                            lastBackup: new Date().toISOString(),
+                            size: '2.3 MB'
+                          }))
+                          toast({ title: "Sauvegarde réussie", description: "La sauvegarde a été créée avec succès." })
+                        }, 2000)
+                      }}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Créer une sauvegarde
+                      </Button>
+                      <Button variant="outline">
+                        <Upload className="h-4 w-4 mr-2" />
+                        Restaurer
+                      </Button>
+                      <Button variant="outline">
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Planifier
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Sauvegardes récentes</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Database className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium">backup_2025_01_15_14_30.sql</p>
+                            <p className="text-sm text-muted-foreground">2.3 MB • 15 Jan 2025, 14:30</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button variant="ghost" size="sm">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Database className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium">backup_2025_01_14_14_30.sql</p>
+                            <p className="text-sm text-muted-foreground">2.1 MB • 14 Jan 2025, 14:30</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button variant="ghost" size="sm">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeDashboardSection === 'configuration' && (
+            <Card className="border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Configuration Système
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Informations générales</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="siteName">Nom du site</Label>
+                          <Input 
+                            id="siteName" 
+                            value={systemSettings.siteName}
+                            onChange={(e) => setSystemSettings({...systemSettings, siteName: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="siteDescription">Description</Label>
+                          <Textarea 
+                            id="siteDescription" 
+                            value={systemSettings.siteDescription}
+                            onChange={(e) => setSystemSettings({...systemSettings, siteDescription: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="currency">Devise</Label>
+                          <Select value={systemSettings.currency} onValueChange={(value) => setSystemSettings({...systemSettings, currency: value})}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="USD">USD ($)</SelectItem>
+                              <SelectItem value="HTG">HTG (G)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Paramètres de sécurité</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Label>Mode maintenance</Label>
+                            <p className="text-sm text-muted-foreground">Désactiver l'accès public</p>
+                          </div>
+                          <Button 
+                            variant={systemSettings.maintenanceMode ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setSystemSettings({...systemSettings, maintenanceMode: !systemSettings.maintenanceMode})}
+                          >
+                            {systemSettings.maintenanceMode ? "Activé" : "Désactivé"}
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Label>Inscription autorisée</Label>
+                            <p className="text-sm text-muted-foreground">Permettre les nouvelles inscriptions</p>
+                          </div>
+                          <Button 
+                            variant={systemSettings.allowRegistration ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setSystemSettings({...systemSettings, allowRegistration: !systemSettings.allowRegistration})}
+                          >
+                            {systemSettings.allowRegistration ? "Autorisé" : "Interdit"}
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Label>Notifications email</Label>
+                            <p className="text-sm text-muted-foreground">Envoyer des notifications par email</p>
+                          </div>
+                          <Button 
+                            variant={systemSettings.emailNotifications ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setSystemSettings({...systemSettings, emailNotifications: !systemSettings.emailNotifications})}
+                          >
+                            {systemSettings.emailNotifications ? "Activé" : "Désactivé"}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button onClick={() => {
+                      toast({ title: "Configuration sauvegardée", description: "Les paramètres ont été mis à jour avec succès." })
+                    }}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Sauvegarder les paramètres
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Financial Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
