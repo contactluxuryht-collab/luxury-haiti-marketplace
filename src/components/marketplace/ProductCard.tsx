@@ -31,7 +31,6 @@ export function ProductCard({
   isInWishlist = false,
 }: ProductCardProps) {
   const { formatPrice } = useSettings()
-  const originalPrice = price * 1.2
 
   const extractOffer = (text: string) => {
     try {
@@ -49,6 +48,9 @@ export function ProductCard({
     }
   }
   const offer = extractOffer(description)
+  
+  // Calculate discounted price if there's a valid offer
+  const discountedPrice = offer && offer.threshold <= price ? price - offer.amount : null
   
   return (
     <Card
@@ -91,19 +93,31 @@ export function ProductCard({
         
         <div className="space-y-1">
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-foreground">
-              {formatPrice(price)}
-            </span>
-            <span className="text-sm text-muted-foreground line-through">
-              {formatPrice(originalPrice)}
-            </span>
+            {discountedPrice ? (
+              <>
+                <span className="text-2xl font-bold text-foreground">
+                  {formatPrice(discountedPrice)}
+                </span>
+                <span className="text-sm text-muted-foreground line-through">
+                  {formatPrice(price)}
+                </span>
+              </>
+            ) : (
+              <span className="text-2xl font-bold text-foreground">
+                {formatPrice(price)}
+              </span>
+            )}
           </div>
           
           <div className="space-y-1 pt-1">
-            {offer && (
+            {offer && offer.threshold <= price && (
               <div className="flex items-center gap-1 text-xs text-red-500">
-                <span>-</span>
-                <span className="font-medium">${offer.amount} off on ${offer.threshold}</span>
+                <span className="font-medium">Save ${offer.amount}</span>
+              </div>
+            )}
+            {offer && offer.threshold > price && (
+              <div className="flex items-center gap-1 text-xs text-blue-500">
+                <span className="font-medium">Spend ${offer.threshold - price} more to save ${offer.amount}</span>
               </div>
             )}
           </div>

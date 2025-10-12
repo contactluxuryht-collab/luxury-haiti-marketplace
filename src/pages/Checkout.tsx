@@ -23,7 +23,7 @@ export default function Checkout() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { cartItems, loading, refetch, clearCart } = useCart()
-  const { formatPrice, t } = useSettings()
+  const { formatPrice, convertToHtg, t } = useSettings()
   const { toast } = useToast()
   const [productsById, setProductsById] = useState<Record<string, CartProduct>>({})
   const [placing, setPlacing] = useState(false)
@@ -100,8 +100,9 @@ export default function Checkout() {
         orderIds = (inserted || []).map((r: any) => r.id)
       }
 
-      // Create Bazik payment
-      console.log('Creating Bazik payment for amount:', amount)
+      // Convert USD amount to HTG for Bazik payment
+      const htgAmount = convertToHtg(amount)
+      console.log('Creating Bazik payment for USD amount:', amount, 'converted to HTG:', htgAmount)
       
       // Generate order ID if not provided
       const orderId = orderIds.length > 0 ? orderIds[0] : `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -112,11 +113,12 @@ export default function Checkout() {
           'Content-Type': 'application/json' 
         },
         body: JSON.stringify({
-          amount: amount,
+          amount: htgAmount, // Send HTG amount to Bazik
           orderId: orderId,
           currency: 'HTG',
           metadata: { 
             order_ids: orderIds,
+            originalUsdAmount: amount, // Keep track of original USD amount
             firstName: 'John',
             lastName: 'Doe',
             email: user.email || 'customer@example.com'
@@ -289,24 +291,34 @@ export default function Checkout() {
               <Card>
                 <CardHeader>
                   <CardTitle>Enter Payment Amount</CardTitle>
-                  <CardDescription>Enter the amount you wish to pay in HTG</CardDescription>
+                  <CardDescription>Enter the amount you wish to pay in USD</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="amount">Amount (HTG)</Label>
+                    <Label htmlFor="amount">Amount (USD)</Label>
                     <Input
                       id="amount"
                       type="number"
                       placeholder="0.00"
                       value={customAmount}
                       onChange={(e) => setCustomAmount(e.target.value)}
-                      min="1"
+                      min="0.01"
                       step="0.01"
                       className="text-2xl font-semibold h-16"
                     />
                   </div>
+                  {customAmount && parseFloat(customAmount) > 0 && (
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-sm text-green-700">
+                        <strong>You will pay: {convertToHtg(parseFloat(customAmount)).toLocaleString()} HTG</strong>
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        Exchange rate: 1 USD = 132 HTG
+                      </p>
+                    </div>
+                  )}
                   <p className="text-sm text-muted-foreground">
-                    Enter any amount you'd like to pay. Minimum: 1 HTG
+                    Enter any amount you'd like to pay. Minimum: $0.01
                   </p>
                 </CardContent>
               </Card>
@@ -322,20 +334,28 @@ export default function Checkout() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="text-muted-foreground">Subtotal (USD)</span>
                     <span className="font-medium">
                       {paymentMode === "custom" 
-                        ? `${customAmount || 0} HTG` 
-                        : formatPrice(subtotal)}
+                        ? `$${customAmount || 0}` 
+                        : `$${subtotal.toFixed(2)}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Amount to Pay (HTG)</span>
+                    <span className="font-medium text-green-600">
+                      {paymentMode === "custom" 
+                        ? `${convertToHtg(parseFloat(customAmount) || 0).toLocaleString()} HTG` 
+                        : `${convertToHtg(subtotal).toLocaleString()} HTG`}
                     </span>
                   </div>
                   <div className="border-t pt-2">
                     <div className="flex justify-between">
-                      <span className="font-semibold">Total</span>
-                      <span className="font-bold text-xl">
+                      <span className="font-semibold">You will pay</span>
+                      <span className="font-bold text-xl text-green-600">
                         {paymentMode === "custom" 
-                          ? `${customAmount || 0} HTG` 
-                          : formatPrice(subtotal)}
+                          ? `${convertToHtg(parseFloat(customAmount) || 0).toLocaleString()} HTG` 
+                          : `${convertToHtg(subtotal).toLocaleString()} HTG`}
                       </span>
                     </div>
                   </div>

@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
+import { useSettings } from '@/hooks/useSettings'
 import { Loader2 } from 'lucide-react'
 
 interface PaymentButtonProps {
-  amount: number
+  amount: number // Amount in USD
   orderId?: string
   metadata?: {
     firstName?: string
@@ -39,12 +40,15 @@ export function PaymentButton({
 }: PaymentButtonProps) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { convertToHtg } = useSettings()
 
   const handlePayment = async () => {
     setLoading(true)
     
     try {
-      console.log('Initiating Bazik payment for amount:', amount)
+      // Convert USD amount to HTG for Bazik payment
+      const htgAmount = convertToHtg(amount)
+      console.log('Initiating Bazik payment for USD amount:', amount, 'converted to HTG:', htgAmount)
       
       // Call Vercel API route to create Bazik payment session
       const response = await fetch('/api/create-bazik-session', {
@@ -53,11 +57,12 @@ export function PaymentButton({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount,
+          amount: htgAmount, // Send HTG amount to Bazik
           currency: 'HTG',
           metadata: {
             ...metadata,
             orderId,
+            originalUsdAmount: amount, // Keep track of original USD amount
           }
         })
       })

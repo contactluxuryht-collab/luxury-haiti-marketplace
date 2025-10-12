@@ -58,7 +58,9 @@ export default function SellerDashboard() {
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalRevenue: 0,
-    pendingOrders: 0
+    pendingOrders: 0,
+    completedOrders: 0,
+    totalOrders: 0
   })
   const [sellerApproved, setSellerApproved] = useState<boolean | null>(null)
   const { toast } = useToast()
@@ -225,13 +227,25 @@ export default function SellerDashboard() {
       if (ordersError) throw ordersError
 
       const totalProducts = userProducts.length
-      const totalRevenue = 0 // Calculate from orders when implemented
+      
+      // Calculate real revenue from completed orders
+      const completedOrders = orders?.filter(order => order.status === 'completed') || []
+      const totalRevenue = completedOrders.reduce((sum, order) => {
+        // Find the product that belongs to this seller
+        const sellerProduct = order.products.find((p: any) => p.seller_id === userData.id)
+        return sum + (sellerProduct ? (sellerProduct.price || 0) : 0)
+      }, 0)
+      
       const pendingOrders = orders?.filter(order => order.status === 'pending').length || 0
+      const completedOrdersCount = completedOrders.length
+      const totalOrders = orders?.length || 0
 
       setStats({
         totalProducts,
         totalRevenue,
-        pendingOrders
+        pendingOrders,
+        completedOrders: completedOrdersCount,
+        totalOrders: totalOrders
       })
     } catch (error) {
       console.error('Error fetching stats:', error)
@@ -661,8 +675,19 @@ Détails du produit:
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.pendingOrders}</div>
-            <p className="text-xs text-muted-foreground">Commandes en attente</p>
+            <div className="text-2xl font-bold">{stats.totalOrders}</div>
+            <p className="text-xs text-muted-foreground">{stats.pendingOrders} en attente</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Commandes terminées</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.completedOrders}</div>
+            <p className="text-xs text-muted-foreground">Commandes complétées</p>
           </CardContent>
         </Card>
       </div>

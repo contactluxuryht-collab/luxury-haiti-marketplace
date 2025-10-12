@@ -9,6 +9,8 @@ type SettingsContextType = {
   currency: SupportedCurrency
   setCurrency: (c: SupportedCurrency) => void
   formatPrice: (usdAmount: number) => string
+  convertToHtg: (usdAmount: number) => number
+  convertToUsd: (htgAmount: number) => number
   t: (key: string) => string
 }
 
@@ -67,6 +69,14 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     return formatter.format(amount)
   }
 
+  const convertToHtg = (usdAmount: number) => {
+    return Math.round(usdAmount * usdToHtg)
+  }
+
+  const convertToUsd = (htgAmount: number) => {
+    return htgAmount / usdToHtg
+  }
+
   const t = useMemo(() => {
     const dict = I18N[language]
     return (key: string) => dict[key] ?? key
@@ -78,6 +88,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     currency,
     setCurrency,
     formatPrice,
+    convertToHtg,
+    convertToUsd,
     t,
   }
 
