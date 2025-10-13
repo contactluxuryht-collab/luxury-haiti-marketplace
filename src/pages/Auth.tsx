@@ -121,21 +121,21 @@ export default function Auth() {
           <h1 className="text-2xl font-bold bg-gradient-luxury bg-clip-text text-transparent">
             Luxury Haiti
           </h1>
-          <p className="text-muted-foreground mt-2">Join our premium marketplace</p>
+          <p className="text-muted-foreground mt-2">Rejoignez notre marché premium</p>
         </div>
 
         <Card className="border-border/50 shadow-luxury">
           <CardHeader className="text-center">
-            <CardTitle>Welcome</CardTitle>
+            <CardTitle>Bienvenue</CardTitle>
             <CardDescription>
-              Sign in to your account or create a new one to start selling
+              Connectez-vous à votre compte ou créez-en un nouveau pour commencer
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsTrigger value="signin">Connexion</TabsTrigger>
+                <TabsTrigger value="signup">S'inscrire</TabsTrigger>
               </TabsList>
 
               {error && (
@@ -154,19 +154,19 @@ export default function Auth() {
                       id="signin-email"
                       name="email"
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder="votre@email.com"
                       required
                       disabled={loading}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password">Password</Label>
+                    <Label htmlFor="signin-password">Mot de passe</Label>
                     <div className="relative">
                       <Input
                         id="signin-password"
                         name="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
+                        placeholder="Entrez votre mot de passe"
                         required
                         disabled={loading}
                       />
@@ -188,7 +188,7 @@ export default function Auth() {
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Sign In
+                    Login
                   </Button>
                 </form>
               </TabsContent>
@@ -196,7 +196,7 @@ export default function Auth() {
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-role">Account Type</Label>
+                    <Label htmlFor="signup-role">Type de compte</Label>
                     <div className="grid grid-cols-2 gap-2">
                       <Button
                         type="button"
@@ -204,7 +204,7 @@ export default function Auth() {
                         onClick={() => setRole('buyer')}
                         className="w-full"
                       >
-                        Buyer
+                        Acheteur
                       </Button>
                       <Button
                         type="button"
@@ -212,30 +212,30 @@ export default function Auth() {
                         onClick={() => setRole('seller')}
                         className="w-full"
                       >
-                        Seller
+                        Vendeur
                       </Button>
                     </div>
                     <input type="hidden" name="role" value={role} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-name">Full Name</Label>
+                    <Label htmlFor="signup-name">Nom complet</Label>
                     <Input
                       id="signup-name"
                       name="name"
                       type="text"
-                      placeholder="Your full name"
+                      placeholder="Votre nom complet"
                       required
                       disabled={loading}
                     />
                   </div>
                   {role === 'seller' && (
                   <div className="space-y-2">
-                    <Label htmlFor="signup-business-name">Business Name</Label>
+                    <Label htmlFor="signup-business-name">Nom de l'entreprise</Label>
                     <Input
                       id="signup-business-name"
                       name="businessName"
                       type="text"
-                      placeholder="Your business name"
+                      placeholder="Nom de votre entreprise"
                       required={role === 'seller'}
                       disabled={loading}
                     />
@@ -243,12 +243,12 @@ export default function Auth() {
                   )}
                   {role === 'seller' && (
                   <div className="space-y-2">
-                    <Label htmlFor="signup-phone">Phone Number</Label>
+                    <Label htmlFor="signup-phone">Numéro de téléphone</Label>
                     <Input
                       id="signup-phone"
                       name="phoneNumber"
                       type="tel"
-                      placeholder="e.g. +1 555 123 4567"
+                      placeholder="ex. +509 1234 5678"
                       required={role === 'seller'}
                       disabled={loading}
                     />
@@ -256,12 +256,12 @@ export default function Auth() {
                   )}
                   {role === 'seller' && (
                   <div className="space-y-2">
-                    <Label htmlFor="signup-selling">What do you want to sell?</Label>
+                    <Label htmlFor="signup-selling">Que voulez-vous vendre ?</Label>
                     <Input
                       id="signup-selling"
                       name="sellingFocus"
                       type="text"
-                      placeholder="e.g. Fashion, Electronics, Home & Living"
+                      placeholder="ex. Mode, Électronique, Maison & Décoration"
                       required={role === 'seller'}
                       disabled={loading}
                     />
@@ -273,19 +273,19 @@ export default function Auth() {
                       id="signup-email"
                       name="email"
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder="votre@email.com"
                       required
                       disabled={loading}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
+                    <Label htmlFor="signup-password">Mot de passe</Label>
                     <div className="relative">
                       <Input
                         id="signup-password"
                         name="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Create a password"
+                        placeholder="Créez un mot de passe"
                         required
                         disabled={loading}
                         minLength={6}
@@ -306,22 +306,23 @@ export default function Auth() {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Password must be at least 6 characters long
+                      Le mot de passe doit contenir au moins 6 caractères
                     </p>
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Create Account
+                    Créer un compte
                   </Button>
                 </form>
               </TabsContent>
+
             </Tabs>
           </CardContent>
         </Card>
 
         <div className="text-center">
           <Button variant="ghost" onClick={() => navigate('/')}>
-            ← Back to Home
+            ← Retour à l'accueil
           </Button>
         </div>
       </div>

@@ -11,8 +11,8 @@ const categories = ["Tous", "Électronique", "Téléphones & Accessoires", "Ordi
 
 export default function Home() {
   const { products, loading } = useProducts()
-  const featured = products.slice(0, 4)
-  const best = products.slice(4, 8)
+  const featured = (products || []).filter((p: any) => p?.is_featured === true).slice(0, 4)
+  const best = (products || []).filter((p: any) => p?.is_best_seller === true).slice(0, 8)
   const handleAddToWishlist = (id: string) => {
     window.location.assign(`/product/${id}`)
   }

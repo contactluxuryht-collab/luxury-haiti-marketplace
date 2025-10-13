@@ -94,6 +94,8 @@ type ProductRow = {
   category_id: string | null
   seller_id: string
   is_active: boolean | null
+  is_featured?: boolean | null
+  is_best_seller?: boolean | null
   created_at: string | null
   seller?: {
     name: string | null
@@ -275,8 +277,14 @@ export default function AdminDashboard() {
       const { count: inactiveProductsCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', false)
       
       // Orders and Revenue
-      const { count: ordersCount } = await supabase.from('orders').select('*', { count: 'exact', head: true })
-      const { data: ordersData } = await supabase.from('orders').select('total_amount, created_at')
+      const { count: ordersCount } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('payment_status', 'paid')
+      const { data: ordersData } = await supabase
+        .from('orders')
+        .select('total_amount, created_at')
+        .eq('payment_status', 'paid')
       const totalRevenue = ordersData?.reduce((sum, order) => sum + (order.total_amount || 0), 0) || 0
       
       // Monthly revenue (last 30 days)
@@ -326,6 +334,7 @@ export default function AdminDashboard() {
       // System uptime calculation (simplified - based on recent activity)
       const { count: recentOrders } = await supabase.from('orders')
         .select('*', { count: 'exact', head: true })
+        .eq('payment_status', 'paid')
         .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Last 24 hours
       
       const systemUptime = recentOrders > 0 ? 99.9 : 95.0 // Simplified uptime calculation
@@ -400,6 +409,7 @@ export default function AdminDashboard() {
           buyer:users!orders_buyer_id_fkey(name, email),
           seller:users!orders_seller_id_fkey(name, email)
         `)
+        .eq('payment_status', 'paid')
         .order('created_at', { ascending: false })
         .limit(50)
       
@@ -1488,6 +1498,8 @@ export default function AdminDashboard() {
                     <TableHead>Catégorie</TableHead>
                     <TableHead>Prix</TableHead>
                     <TableHead>Statut</TableHead>
+                    <TableHead>Vedette</TableHead>
+                    <TableHead>Best-seller</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -1535,6 +1547,46 @@ export default function AdminDashboard() {
                             Inactif
                           </Badge>
                         )}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          variant={product.is_featured ? "default" : "outline"}
+                          onClick={async () => {
+                            const { error } = await supabase
+                              .from('products')
+                              .update({ is_featured: !product.is_featured })
+                              .eq('id', product.id)
+                            if (error) {
+                              toast({ title: 'Echec', description: error.message, variant: 'destructive' })
+                            } else {
+                              toast({ title: product.is_featured ? 'Retiré des vedettes' : 'Ajouté aux vedettes' })
+                              fetchAllProducts()
+                            }
+                          }}
+                        >
+                          {product.is_featured ? 'Retirer' : 'Ajouter'}
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          variant={product.is_best_seller ? "default" : "outline"}
+                          onClick={async () => {
+                            const { error } = await supabase
+                              .from('products')
+                              .update({ is_best_seller: !product.is_best_seller })
+                              .eq('id', product.id)
+                            if (error) {
+                              toast({ title: 'Echec', description: error.message, variant: 'destructive' })
+                            } else {
+                              toast({ title: product.is_best_seller ? 'Retiré des meilleures ventes' : 'Ajouté aux meilleures ventes' })
+                              fetchAllProducts()
+                            }
+                          }}
+                        >
+                          {product.is_best_seller ? 'Retirer' : 'Ajouter'}
+                        </Button>
                       </TableCell>
                       <TableCell className="text-right space-x-2">
                         <Button 

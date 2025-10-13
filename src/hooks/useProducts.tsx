@@ -10,6 +10,9 @@ export interface Product {
   seller_id: string
   category_id: string | null
   created_at: string
+  is_active?: boolean | null
+  is_featured?: boolean | null
+  is_best_seller?: boolean | null
   seller?: {
     name: string | null
     email: string

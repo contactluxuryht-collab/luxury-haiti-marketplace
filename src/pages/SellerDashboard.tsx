@@ -609,7 +609,9 @@ Détails du produit:
           buyer:users!orders_buyer_id_fkey(name, email, phone_number)
         `)
         .eq('seller_id', userData.id)
+        .eq('payment_status', 'paid')
         .order('created_at', { ascending: false })
+        .limit(5)
 
       if (ordersError) throw ordersError
 
@@ -887,7 +889,7 @@ Détails du produit:
       {sellerApproved === true && (
         <Card className="border-border/50">
           <CardHeader>
-            <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <ShoppingCart className="h-5 w-5" />
@@ -895,18 +897,23 @@ Détails du produit:
                 </CardTitle>
                 <CardDescription>Suivez et gérez les commandes de vos produits</CardDescription>
               </div>
-              <Button 
-                variant="outline" 
-                onClick={fetchOrders}
-                disabled={ordersLoading}
-              >
-                {ordersLoading ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                )}
-                Actualiser
-              </Button>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={fetchOrders}
+                    disabled={ordersLoading}
+                  >
+                    {ordersLoading ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                    )}
+                    Actualiser
+                  </Button>
+                  <Button onClick={() => window.location.assign('/seller/orders')}>
+                    Ouvrir la page commandes
+                  </Button>
+                </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -1177,7 +1184,10 @@ Détails du produit:
                     </div>
                     <div>
                       <h3 className="font-semibold">{product.title}</h3>
-                      <p className="text-sm text-muted-foreground">{product.description}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {(product.description || '').replace(/\s+/g, ' ').slice(0, 140)}
+                        {(product.description || '').length > 140 ? '…' : ''}
+                      </p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="secondary">${product.price}</Badge>
                         <Badge variant="outline">Actif</Badge>
