@@ -52,6 +52,7 @@ export default function ProductDetail() {
             seller:users!products_seller_id_fkey(name, email, phone_number)
           `)
           .eq('id', id)
+          .eq('is_active', true)
           .single()
         if (error) throw error
         setProduct(data as any)
@@ -112,6 +113,7 @@ export default function ProductDetail() {
               seller:users!products_seller_id_fkey(name, email, phone_number)
             `)
             .eq('category_id', (data as any).category_id)
+            .eq('is_active', true)
             .neq('id', id)
             .limit(4)
           setRelated((rel as any) || [])

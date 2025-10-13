@@ -13,6 +13,11 @@ export default function Home() {
   const { products, loading } = useProducts()
   const featured = (products || []).filter((p: any) => p?.is_featured === true).slice(0, 4)
   const best = (products || []).filter((p: any) => p?.is_best_seller === true).slice(0, 8)
+  
+  // Debug logging
+  console.log('Home page - Total products:', products?.length)
+  console.log('Home page - Featured products:', featured.length, featured.map(p => p.title))
+  console.log('Home page - Best seller products:', best.length, best.map(p => p.title))
   const handleAddToWishlist = (id: string) => {
     window.location.assign(`/product/${id}`)
   }

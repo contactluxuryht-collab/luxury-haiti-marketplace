@@ -94,8 +94,8 @@ type ProductRow = {
   category_id: string | null
   seller_id: string
   is_active: boolean | null
-  is_featured?: boolean | null
-  is_best_seller?: boolean | null
+  is_featured: boolean | null
+  is_best_seller: boolean | null
   created_at: string | null
   seller?: {
     name: string | null
@@ -169,6 +169,11 @@ export default function AdminDashboard() {
     size: "0 MB"
   })
   const [activeDashboardSection, setActiveDashboardSection] = useState<string | null>(null)
+  const [editingCategory, setEditingCategory] = useState<any>(null)
+  const [newCategoryName, setNewCategoryName] = useState("")
+  const [newCategoryDescription, setNewCategoryDescription] = useState("")
+  const [showAddCategory, setShowAddCategory] = useState(false)
+  const [showEditCategory, setShowEditCategory] = useState(false)
   const isAdmin = useMemo(() => (user?.user_metadata as any)?.role === 'admin', [user])
 
   useEffect(() => {
@@ -675,6 +680,90 @@ export default function AdminDashboard() {
       fetchAllProducts()
       fetchOverview()
     }
+  }
+
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) {
+      toast({ title: 'Error', description: 'Category name is required', variant: 'destructive' })
+      return
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .insert([{
+          name: newCategoryName.trim(),
+          description: newCategoryDescription.trim() || null
+        }])
+      
+      if (error) throw error
+      
+      toast({ title: 'Category added successfully' })
+      setNewCategoryName("")
+      setNewCategoryDescription("")
+      setShowAddCategory(false)
+      // Refresh categories
+      window.location.reload()
+    } catch (error: any) {
+      toast({ title: 'Failed to add category', description: error.message, variant: 'destructive' })
+    }
+  }
+
+  const handleEditCategory = async () => {
+    if (!editingCategory || !newCategoryName.trim()) {
+      toast({ title: 'Error', description: 'Category name is required', variant: 'destructive' })
+      return
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .update({
+          name: newCategoryName.trim(),
+          description: newCategoryDescription.trim() || null
+        })
+        .eq('id', editingCategory.id)
+      
+      if (error) throw error
+      
+      toast({ title: 'Category updated successfully' })
+      setEditingCategory(null)
+      setNewCategoryName("")
+      setNewCategoryDescription("")
+      setShowEditCategory(false)
+      // Refresh categories
+      window.location.reload()
+    } catch (error: any) {
+      toast({ title: 'Failed to update category', description: error.message, variant: 'destructive' })
+    }
+  }
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    if (!confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
+      return
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', categoryId)
+      
+      if (error) throw error
+      
+      toast({ title: 'Category deleted successfully' })
+      // Refresh categories
+      window.location.reload()
+    } catch (error: any) {
+      toast({ title: 'Failed to delete category', description: error.message, variant: 'destructive' })
+    }
+  }
+
+  const openEditCategory = (category: any) => {
+    setEditingCategory(category)
+    setNewCategoryName(category.name)
+    setNewCategoryDescription(category.description || "")
+    setShowEditCategory(true)
   }
 
   if (loading) {
@@ -1552,16 +1641,32 @@ export default function AdminDashboard() {
                         <Button
                           size="sm"
                           variant={product.is_featured ? "default" : "outline"}
-                          onClick={async () => {
-                            const { error } = await supabase
-                              .from('products')
-                              .update({ is_featured: !product.is_featured })
-                              .eq('id', product.id)
-                            if (error) {
-                              toast({ title: 'Echec', description: error.message, variant: 'destructive' })
-                            } else {
-                              toast({ title: product.is_featured ? 'Retiré des vedettes' : 'Ajouté aux vedettes' })
-                              fetchAllProducts()
+                          onClick={async (e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            console.log('Featured button clicked!')
+                            console.log('Updating featured status for product:', product.id, 'from', product.is_featured, 'to', !product.is_featured)
+                            
+                            try {
+                              const { data, error } = await supabase
+                                .from('products')
+                                .update({ is_featured: !product.is_featured })
+                                .eq('id', product.id)
+                                .select('id, is_featured, is_best_seller')
+                              
+                              console.log('Update result:', { data, error })
+                              
+                              if (error) {
+                                console.error('Featured update error:', error)
+                                toast({ title: 'Echec', description: error.message, variant: 'destructive' })
+                              } else {
+                                console.log('Featured update successful:', data)
+                                toast({ title: product.is_featured ? 'Retiré des vedettes' : 'Ajouté aux vedettes' })
+                                fetchAllProducts()
+                              }
+                            } catch (err) {
+                              console.error('Unexpected error:', err)
+                              toast({ title: 'Erreur inattendue', description: String(err), variant: 'destructive' })
                             }
                           }}
                         >
@@ -1572,16 +1677,32 @@ export default function AdminDashboard() {
                         <Button
                           size="sm"
                           variant={product.is_best_seller ? "default" : "outline"}
-                          onClick={async () => {
-                            const { error } = await supabase
-                              .from('products')
-                              .update({ is_best_seller: !product.is_best_seller })
-                              .eq('id', product.id)
-                            if (error) {
-                              toast({ title: 'Echec', description: error.message, variant: 'destructive' })
-                            } else {
-                              toast({ title: product.is_best_seller ? 'Retiré des meilleures ventes' : 'Ajouté aux meilleures ventes' })
-                              fetchAllProducts()
+                          onClick={async (e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            console.log('Best seller button clicked!')
+                            console.log('Updating best seller status for product:', product.id, 'from', product.is_best_seller, 'to', !product.is_best_seller)
+                            
+                            try {
+                              const { data, error } = await supabase
+                                .from('products')
+                                .update({ is_best_seller: !product.is_best_seller })
+                                .eq('id', product.id)
+                                .select('id, is_featured, is_best_seller')
+                              
+                              console.log('Update result:', { data, error })
+                              
+                              if (error) {
+                                console.error('Best seller update error:', error)
+                                toast({ title: 'Echec', description: error.message, variant: 'destructive' })
+                              } else {
+                                console.log('Best seller update successful:', data)
+                                toast({ title: product.is_best_seller ? 'Retiré des meilleures ventes' : 'Ajouté aux meilleures ventes' })
+                                fetchAllProducts()
+                              }
+                            } catch (err) {
+                              console.error('Unexpected error:', err)
+                              toast({ title: 'Erreur inattendue', description: String(err), variant: 'destructive' })
                             }
                           }}
                         >
@@ -1842,6 +1963,107 @@ export default function AdminDashboard() {
             </Card>
           </div>
 
+          {/* Home Page Management */}
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="h-5 w-5" />
+                Gestion de la page d'accueil
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-medium mb-3">Produits en vedette</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Gérez quels produits apparaissent dans la section "Produits en vedette" de la page d'accueil
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {allProducts.filter(p => p.is_featured).map((product) => (
+                      <div key={product.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                            {product.image_url ? (
+                              <img src={product.image_url} alt={product.title} className="w-full h-full object-cover rounded-lg" />
+                            ) : (
+                              <Package className="h-5 w-5 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{product.title}</p>
+                            <p className="text-xs text-muted-foreground">${product.price}</p>
+                          </div>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={async () => {
+                            const { error } = await supabase
+                              .from('products')
+                              .update({ is_featured: false })
+                              .eq('id', product.id)
+                            if (error) {
+                              toast({ title: 'Erreur', description: error.message, variant: 'destructive' })
+                            } else {
+                              toast({ title: 'Produit retiré des vedettes' })
+                              fetchAllProducts()
+                            }
+                          }}
+                        >
+                          Retirer
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-3">Meilleures ventes</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Gérez quels produits apparaissent dans la section "Meilleures ventes" de la page d'accueil
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {allProducts.filter(p => p.is_best_seller).map((product) => (
+                      <div key={product.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                            {product.image_url ? (
+                              <img src={product.image_url} alt={product.title} className="w-full h-full object-cover rounded-lg" />
+                            ) : (
+                              <Package className="h-5 w-5 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{product.title}</p>
+                            <p className="text-xs text-muted-foreground">${product.price}</p>
+                          </div>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={async () => {
+                            const { error } = await supabase
+                              .from('products')
+                              .update({ is_best_seller: false })
+                              .eq('id', product.id)
+                            if (error) {
+                              toast({ title: 'Erreur', description: error.message, variant: 'destructive' })
+                            } else {
+                              toast({ title: 'Produit retiré des meilleures ventes' })
+                              fetchAllProducts()
+                            }
+                          }}
+                        >
+                          Retirer
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Category Management */}
           <Card className="border-border/50">
             <CardHeader>
@@ -1854,7 +2076,7 @@ export default function AdminDashboard() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium">Catégories existantes</h4>
-                  <Button size="sm">
+                  <Button size="sm" onClick={() => setShowAddCategory(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Ajouter une catégorie
                   </Button>
@@ -1869,10 +2091,10 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                       <div className="flex gap-1">
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => openEditCategory(category)}>
                           <Edit className="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                        <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700" onClick={() => handleDeleteCategory(category.id)}>
                           <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>
@@ -1922,6 +2144,86 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Add Category Dialog */}
+      <Dialog open={showAddCategory} onOpenChange={setShowAddCategory}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ajouter une catégorie</DialogTitle>
+            <DialogDescription>
+              Créer une nouvelle catégorie de produits
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="category-name">Nom de la catégorie</Label>
+              <Input 
+                id="category-name"
+                value={newCategoryName} 
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="Nom de la catégorie"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category-description">Description (optionnel)</Label>
+              <Textarea 
+                id="category-description"
+                value={newCategoryDescription} 
+                onChange={(e) => setNewCategoryDescription(e.target.value)}
+                placeholder="Description de la catégorie"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddCategory(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleAddCategory}>
+              Ajouter la catégorie
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Category Dialog */}
+      <Dialog open={showEditCategory} onOpenChange={setShowEditCategory}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modifier la catégorie</DialogTitle>
+            <DialogDescription>
+              Modifier les informations de la catégorie
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-category-name">Nom de la catégorie</Label>
+              <Input 
+                id="edit-category-name"
+                value={newCategoryName} 
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="Nom de la catégorie"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-category-description">Description (optionnel)</Label>
+              <Textarea 
+                id="edit-category-description"
+                value={newCategoryDescription} 
+                onChange={(e) => setNewCategoryDescription(e.target.value)}
+                placeholder="Description de la catégorie"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditCategory(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleEditCategory}>
+              Sauvegarder les modifications
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Add Product Dialog */}
       <Dialog open={showAddProduct} onOpenChange={setShowAddProduct}>

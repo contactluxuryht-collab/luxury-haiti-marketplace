@@ -77,6 +77,7 @@ export function useWishlist() {
           seller:users!products_seller_id_fkey(name, email)
         `)
         .in('id', productIds)
+        .eq('is_active', true)
 
       if (productsError) throw productsError
 

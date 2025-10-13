@@ -38,6 +38,7 @@ export default function Cart() {
         .from('products')
         .select('id, title, price, image_url, seller_id')
         .in('id', productIds)
+        .eq('is_active', true)
       const map: Record<string, CartProduct> = {}
       ;(data || []).forEach((p: any) => { map[p.id] = p })
       setProductsById(map)

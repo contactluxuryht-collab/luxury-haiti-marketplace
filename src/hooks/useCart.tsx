@@ -51,6 +51,7 @@ export function useCart() {
           .from('products')
           .select('id, price')
           .in('id', productIds)
+          .eq('is_active', true)
         
         const prices: Record<string, number> = {}
         products?.forEach(product => {
@@ -121,6 +122,7 @@ export function useCart() {
         .from('products')
         .select('id, price')
         .eq('id', productId)
+        .eq('is_active', true)
         .single()
       
       if (product) {
