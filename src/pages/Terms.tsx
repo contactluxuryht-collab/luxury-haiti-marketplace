@@ -15,7 +15,7 @@ export default function Terms() {
           Veuillez lire attentivement ces conditions avant d’utiliser nos services.
         </p>
         <Badge variant="secondary" className="text-sm">
-          Dernière mise à jour : Janvier 2024
+          Dernière mise à jour : Octobre 2025
         </Badge>
       </div>
 
@@ -102,6 +102,181 @@ export default function Terms() {
               </li>
             </ul>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Inscription du vendeur */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            Inscription du vendeur
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">
+            Tout vendeur doit fournir des informations exactes et vérifiables lors de son inscription. Luxury Haiti se
+            réserve le droit de refuser, suspendre ou supprimer un compte vendeur en cas d’informations inexactes,
+            d’activité frauduleuse ou de non‑respect des présentes conditions.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Conditions financières */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Scale className="h-5 w-5 text-primary" />
+            Conditions financières
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">
+            Pour chaque commande effectuée via la plateforme, Luxury Haiti applique un frais total de <span className="font-semibold">5,4%</span> du montant de la transaction. Ce pourcentage couvre les coûts liés à la gestion, au traitement et à la maintenance des paiements sur la plateforme.
+          </p>
+          <p className="text-muted-foreground">
+            Le solde restant est automatiquement reversé au vendeur après validation de la commande. Aucun autre frais
+            caché n’est appliqué.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Versement des fonds */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Versement des fonds
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">
+            Les paiements destinés aux vendeurs sont transférés après la confirmation de la commande par l’acheteur et la
+            validation du bon déroulement de la transaction. Le délai de transfert varie généralement entre 24 et 72 heures
+            ouvrées, selon le mode de paiement utilisé.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Responsabilités du vendeur */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-primary" />
+            Responsabilités du vendeur
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">Le vendeur est entièrement responsable&nbsp;:</p>
+          <ul className="space-y-2 text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <span className="text-primary">•</span>
+              <span>de la conformité, qualité et authenticité des produits proposés,</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary">•</span>
+              <span>du respect des délais de livraison,</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary">•</span>
+              <span>et de la satisfaction du client final.</span>
+            </li>
+          </ul>
+          <p className="text-muted-foreground">
+            Luxury Haiti n’est pas responsable des litiges entre vendeurs et acheteurs, sauf en cas de dysfonctionnement
+            technique avéré de la plateforme.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Produits interdits */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-primary" />
+            Produits interdits
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">Il est strictement interdit de publier ou de vendre sur LHT&nbsp;:</p>
+          <ul className="space-y-2 text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <span className="text-primary">•</span>
+              <span>des produits illégaux, contrefaits, dangereux ou non conformes aux lois haïtiennes,</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary">•</span>
+              <span>des contenus à caractère discriminatoire, pornographique, diffamatoire ou offensant.</span>
+            </li>
+          </ul>
+          <p className="text-muted-foreground">
+            Luxury Haiti se réserve le droit de supprimer immédiatement tout produit ou compte ne respectant pas ces règles.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Propriété intellectuelle */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Propriété intellectuelle
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">
+            Le vendeur conserve la propriété de ses produits, images et contenus. En publiant sur LHT, il accorde à la
+            plateforme une autorisation non exclusive d’utiliser ces éléments à des fins promotionnelles (publicité,
+            bannière, réseaux sociaux, etc.) dans le cadre de la mise en avant du site.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Confidentialité */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-primary" />
+            Confidentialité
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">
+            Luxury Haiti s’engage à protéger les données personnelles et commerciales de ses vendeurs. Aucune information
+            ne sera transmise à des tiers sans consentement, sauf en cas d’obligation légale.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Résiliation */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Résiliation
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">
+            Luxury Haiti peut suspendre ou supprimer un compte vendeur à tout moment en cas de violation des présentes
+            conditions. Le vendeur peut également demander la fermeture de son compte à tout moment via le support.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Acceptation des conditions */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Scale className="h-5 w-5 text-primary" />
+            Acceptation des conditions
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">
+            L’inscription et l’utilisation du compte vendeur impliquent l’acceptation complète et sans réserve des présentes
+            conditions d’utilisation, y compris le frais total de <span className="font-semibold">5,4%</span> appliqué sur chaque transaction.
+          </p>
         </CardContent>
       </Card>
 
