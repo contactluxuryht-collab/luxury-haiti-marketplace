@@ -15,6 +15,11 @@ const STATIC_ASSETS = [
   '/lht-hero.jpg.png',
   '/placeholder.svg',
   '/robots.txt',
+  '/offline.html',
+  // PWA Icons
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/icons/icon-144x144.png',
   // Add critical CSS and JS files
   '/src/main.tsx',
   '/src/App.tsx',
@@ -167,9 +172,14 @@ async function networkFirstWithOfflineFallback(request) {
     return networkResponse;
   } catch (error) {
     console.log('[ServiceWorker] Network failed for navigation, serving offline page');
-    const cachedResponse = await caches.match('/');
+    const cachedResponse = await caches.match('/offline.html');
     if (cachedResponse) {
       return cachedResponse;
+    }
+    // Fallback to home page if offline page not available
+    const homeResponse = await caches.match('/');
+    if (homeResponse) {
+      return homeResponse;
     }
     return new Response(`
       <!DOCTYPE html>
@@ -242,8 +252,8 @@ self.addEventListener('push', (event) => {
     const data = event.data.json();
     const options = {
       body: data.body,
-      icon: '/favicon.png',
-      badge: '/favicon.png',
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/icon-192x192.png',
       vibrate: [100, 50, 100],
       data: {
         dateOfArrival: Date.now(),
@@ -253,12 +263,12 @@ self.addEventListener('push', (event) => {
         {
           action: 'explore',
           title: 'View Product',
-          icon: '/favicon.png'
+          icon: '/icons/icon-192x192.png'
         },
         {
           action: 'close',
           title: 'Close',
-          icon: '/favicon.png'
+          icon: '/icons/icon-192x192.png'
         }
       ]
     };
@@ -273,17 +283,46 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/marketplace')
-    );
-  } else if (event.action === 'close') {
+  const data = event.notification.data || {};
+  const action = event.action;
+
+  let url = '/';
+
+  // Handle different notification types and actions
+  if (action === 'view-order' || (data.type === 'order' && !action)) {
+    url = '/profile';
+  } else if (action === 'track-order' || data.type === 'shipping') {
+    url = '/profile';
+  } else if (action === 'rate-order' || data.type === 'delivery') {
+    url = '/profile';
+  } else if (action === 'view-product' || data.type === 'price' || data.type === 'wishlist' || data.type === 'new-product') {
+    url = '/marketplace';
+  } else if (action === 'add-to-cart') {
+    url = '/cart';
+  } else if (action === 'view-cart' || data.type === 'cart') {
+    url = '/cart';
+  } else if (action === 'view-offers' || data.type === 'promotion') {
+    url = '/marketplace';
+  } else if (action === 'explore') {
+    url = '/marketplace';
+  } else if (action === 'close') {
     // Just close the notification
     return;
-  } else {
-    // Default action - open the app
-    event.waitUntil(
-      clients.openWindow('/')
-    );
   }
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then((clientList) => {
+      // Check if there's already a window/tab open with the target URL
+      for (const client of clientList) {
+        if (client.url.includes(url) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      
+      // If no existing window, open a new one
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
+    })
+  );
 });

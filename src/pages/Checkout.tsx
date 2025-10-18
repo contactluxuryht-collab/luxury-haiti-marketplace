@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { useCart } from "@/hooks/useCart"
 import { useSettings } from "@/hooks/useSettings"
 import { useToast } from "@/hooks/use-toast"
+import { notificationService } from "@/services/notificationService"
 import { Loader2, CreditCard, ShoppingBag } from "lucide-react"
 
 type CartProduct = {

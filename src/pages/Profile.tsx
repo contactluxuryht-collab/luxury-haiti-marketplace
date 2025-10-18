@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, User } from "lucide-react"
+import { Loader2, User, Bell } from "lucide-react"
+import NotificationSettings from "@/components/NotificationSettings"
 
 interface Profile {
   id: string
@@ -218,6 +219,15 @@ export default function Profile() {
           </form>
         </CardContent>
       </Card>
+
+      {/* Notification Settings */}
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Bell className="h-5 w-5 text-orange-600" />
+          <h2 className="text-2xl font-bold text-foreground">Notifications</h2>
+        </div>
+        <NotificationSettings />
+      </div>
     </div>
   )
 }

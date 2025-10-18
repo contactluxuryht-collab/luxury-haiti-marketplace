@@ -100,7 +100,7 @@ export function MainLayout({
                 )}
               </Button>
               
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" onClick={() => navigate('/profile')} aria-label="Notifications">
                 <Bell className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"></span>
               </Button>

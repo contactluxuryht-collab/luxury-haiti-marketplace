@@ -1,20 +1,30 @@
 import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle } from "lucide-react"
+import { notificationService } from "@/services/notificationService"
 
 export default function Success() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   useEffect(() => {
+    // Send order placed notification
+    const orderId = searchParams.get('orderId') || `ORDER_${Date.now()}`
+    const amount = parseFloat(searchParams.get('amount') || '0')
+    
+    if (amount > 0) {
+      notificationService.notifyOrderPlaced(orderId, amount)
+    }
+
     // Auto-redirect after 5 seconds
     const timer = setTimeout(() => {
       navigate('/marketplace')
     }, 5000)
 
     return () => clearTimeout(timer)
-  }, [navigate])
+  }, [navigate, searchParams])
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-muted/20">

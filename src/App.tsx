@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { SettingsProvider } from "@/hooks/useSettings";
 import { AuthProvider } from "@/hooks/useAuth";
+import { NotificationProvider } from "@/hooks/useNotifications";
+import { NotificationManager } from "@/components/NotificationBanner";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import Home from "./pages/Home";
 import Marketplace from "./pages/Marketplace";
 import Search from "./pages/Search";
@@ -37,6 +40,8 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <SettingsProvider>
+            <NotificationProvider>
+              <NotificationManager>
           <Routes>
             {/* Standalone auth page without layout */}
             <Route path="/auth" element={<Auth />} />
@@ -134,6 +139,9 @@ const App = () => (
               </MainLayout>
             } />
           </Routes>
+          <PWAInstallPrompt />
+              </NotificationManager>
+            </NotificationProvider>
           </SettingsProvider>
         </AuthProvider>
       </BrowserRouter>

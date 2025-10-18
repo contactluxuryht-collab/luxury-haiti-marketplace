@@ -12,16 +12,34 @@
   "categories": ["shopping", "business", "lifestyle"],
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/favicon.png",
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/favicon.ico",
@@ -46,7 +64,7 @@
       "url": "/marketplace",
       "icons": [
         {
-          "src": "/favicon.png",
+          "src": "/icons/icon-192x192.png",
           "sizes": "192x192"
         }
       ]
@@ -58,7 +76,7 @@
       "url": "/cart",
       "icons": [
         {
-          "src": "/favicon.png",
+          "src": "/icons/icon-192x192.png",
           "sizes": "192x192"
         }
       ]
@@ -70,7 +88,7 @@
       "url": "/wishlist",
       "icons": [
         {
-          "src": "/favicon.png",
+          "src": "/icons/icon-192x192.png",
           "sizes": "192x192"
         }
       ]

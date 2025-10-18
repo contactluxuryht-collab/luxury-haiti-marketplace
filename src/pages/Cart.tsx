@@ -7,6 +7,7 @@ import { useCart } from '@/hooks/useCart'
 import { useAuth } from '@/hooks/useAuth'
 import { useSettings } from '@/hooks/useSettings'
 import { supabase } from '@/integrations/supabase/client'
+import { notificationService } from '@/services/notificationService'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -45,6 +46,17 @@ export default function Cart() {
     }
     loadProducts()
   }, [cartItems])
+
+  // Cart reminder notification
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      const reminderTimeout = setTimeout(() => {
+        notificationService.notifyCartReminder()
+      }, 300000) // 5 minutes
+
+      return () => clearTimeout(reminderTimeout)
+    }
+  }, [cartItems.length])
 
   const items = useMemo(() => cartItems.map(ci => ({
     ...ci,
