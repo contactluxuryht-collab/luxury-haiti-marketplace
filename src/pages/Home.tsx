@@ -1,53 +1,45 @@
-import { SearchIcon, Filter, TrendingUp, Menu, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ProductCard } from "@/components/marketplace/ProductCard"
+import { SearchIcon, Filter, TrendingUp, Menu, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ProductCard } from "@/components/marketplace/ProductCard";
 // Hero image served from /public. Save your image as public/lht-hero.jpg
-import { useProducts } from "@/hooks/useProducts"
+import { useProducts } from "@/hooks/useProducts";
 
 // We now use real products from Supabase via useProducts
 
-const categories = ["Tous", "Électronique", "Téléphones & Accessoires", "Ordinateurs & Portables", "Audio & Casques", "Jeux", "18+ (Adultes)"]
-
+const categories = ["Tous", "Électronique", "Téléphones & Accessoires", "Ordinateurs & Portables", "Audio & Casques", "Jeux", "18+ (Adultes)"];
 export default function Home() {
-  const { products, loading } = useProducts()
-  const featured = (products || []).filter((p: any) => p?.is_featured === true).slice(0, 4)
-  const best = (products || []).filter((p: any) => p?.is_best_seller === true).slice(0, 8)
-  
+  const {
+    products,
+    loading
+  } = useProducts();
+  const featured = (products || []).filter((p: any) => p?.is_featured === true).slice(0, 4);
+  const best = (products || []).filter((p: any) => p?.is_best_seller === true).slice(0, 8);
+
   // Debug logging
-  console.log('Home page - Total products:', products?.length)
-  console.log('Home page - Featured products:', featured.length, featured.map(p => p.title))
-  console.log('Home page - Best seller products:', best.length, best.map(p => p.title))
+  console.log('Home page - Total products:', products?.length);
+  console.log('Home page - Featured products:', featured.length, featured.map(p => p.title));
+  console.log('Home page - Best seller products:', best.length, best.map(p => p.title));
   const handleAddToWishlist = (id: string) => {
-    window.location.assign(`/product/${id}`)
-  }
-
+    window.location.assign(`/product/${id}`);
+  };
   const handleViewProduct = (id: string) => {
-    window.location.assign(`/product/${id}`)
-  }
-
+    window.location.assign(`/product/${id}`);
+  };
   const handleSearch = () => {
-    window.location.assign('/search')
-  }
-
+    window.location.assign('/search');
+  };
   const handleOpenFilters = () => {
-    window.location.assign('/search')
-  }
-
+    window.location.assign('/search');
+  };
   const handleCategoryClick = (category: string) => {
-    window.location.assign(`/marketplace?category=${category}`)
-  }
-
-  return (
-    <div className="space-y-6 md:space-y-8">
+    window.location.assign(`/marketplace?category=${category}`);
+  };
+  return <div className="space-y-6 md:space-y-8">
       {/* Hero Section */}
       <section className="relative overflow-hidden rounded-2xl bg-gradient-luxury">
         <div className="absolute inset-0">
-          <img
-            src={"/lht-hero.jpg.png"}
-            alt="Luxury Haiti Marketplace"
-            className="w-full h-full object-cover"
-          />
+          <img src={"/lht-hero.jpg.png"} alt="Luxury Haiti Marketplace" className="w-full h-full object-cover" />
         </div>
         
         <div className="relative px-4 md:px-8 py-12 md:py-24">
@@ -56,7 +48,7 @@ export default function Home() {
                 Découvrez Luxury Haiti
               </h1>
             <p className="text-base md:text-xl text-white/90 mb-6 md:mb-8 leading-relaxed drop-shadow-md">
-              Un marché moderne où vous trouvez tout : mode, électronique, maison et plus encore—with un accent fort sur les produits haïtiens.
+              Un marché moderne où vous trouvez tout : mode, électronique, maison et plus encore avec un accent fort sur les produits haïtiens.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button variant="hero" size="hero" className="shadow-elevated bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => window.location.assign('/marketplace')}>
@@ -76,10 +68,7 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row gap-3 md:gap-4 items-stretch">
           {/* All Categories Button */}
           <div className="lg:w-48">
-            <Button 
-              variant="default" 
-              className="w-full h-12 justify-between bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
-            >
+            <Button variant="default" className="w-full h-12 justify-between bg-primary text-primary-foreground hover:bg-primary/90 font-medium">
               <div className="flex items-center gap-2">
                 <Menu className="h-4 w-4" />
                 Toutes les catégories
@@ -92,10 +81,7 @@ export default function Home() {
           <div className="flex-1 flex gap-3 md:gap-4">
             <div className="relative flex-1">
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-              <Input
-                placeholder="Rechercher des produits, marques et plus…"
-                className="pl-10 h-11 md:h-12 bg-background border-border text-foreground placeholder:text-muted-foreground"
-              />
+              <Input placeholder="Rechercher des produits, marques et plus…" className="pl-10 h-11 md:h-12 bg-background border-border text-foreground placeholder:text-muted-foreground" />
             </div>
             
             <Button variant="default" className="h-11 md:h-12 px-6 md:px-8 bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleSearch}>
@@ -113,21 +99,9 @@ export default function Home() {
 
         {/* Categories Tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2 border-b border-border">
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={category === "Tous" ? "default" : "ghost"}
-              className={`whitespace-nowrap border-b-2 rounded-none ${
-                category === "Tous" 
-                  ? "border-primary bg-primary/10 text-primary" 
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-transparent"
-              }`}
-              size="sm"
-              onClick={() => handleCategoryClick(category)}
-            >
+          {categories.map(category => <Button key={category} variant={category === "Tous" ? "default" : "ghost"} className={`whitespace-nowrap border-b-2 rounded-none ${category === "Tous" ? "border-primary bg-primary/10 text-primary" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-transparent"}`} size="sm" onClick={() => handleCategoryClick(category)}>
               {category}
-            </Button>
-          ))}
+            </Button>)}
         </div>
       </section>
 
@@ -142,23 +116,11 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-          {(loading ? [] : featured).map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              title={product.title}
-              description={product.description || ""}
-              price={product.price}
-              imageUrl={product.image_url || "/placeholder.svg"}
-              seller={{
-                name: product.seller?.name || "Unknown Seller",
-                avatar: "",
-                phoneNumber: product.seller?.phone_number || null
-              }}
-              onAddToWishlist={handleAddToWishlist}
-              onViewProduct={handleViewProduct}
-            />
-          ))}
+          {(loading ? [] : featured).map(product => <ProductCard key={product.id} id={product.id} title={product.title} description={product.description || ""} price={product.price} imageUrl={product.image_url || "/placeholder.svg"} seller={{
+          name: product.seller?.name || "Unknown Seller",
+          avatar: "",
+          phoneNumber: product.seller?.phone_number || null
+        }} onAddToWishlist={handleAddToWishlist} onViewProduct={handleViewProduct} />)}
         </div>
       </section>
 
@@ -173,23 +135,11 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-          {(loading ? [] : best).map((product) => (
-            <ProductCard
-              key={`best-${product.id}`}
-              id={product.id}
-              title={product.title}
-              description={product.description || ""}
-              price={product.price}
-              imageUrl={product.image_url || "/placeholder.svg"}
-              seller={{
-                name: product.seller?.name || "Unknown Seller",
-                avatar: "",
-                phoneNumber: product.seller?.phone_number || null
-              }}
-              onAddToWishlist={handleAddToWishlist}
-              onViewProduct={handleViewProduct}
-            />
-          ))}
+          {(loading ? [] : best).map(product => <ProductCard key={`best-${product.id}`} id={product.id} title={product.title} description={product.description || ""} price={product.price} imageUrl={product.image_url || "/placeholder.svg"} seller={{
+          name: product.seller?.name || "Unknown Seller",
+          avatar: "",
+          phoneNumber: product.seller?.phone_number || null
+        }} onAddToWishlist={handleAddToWishlist} onViewProduct={handleViewProduct} />)}
         </div>
       </section>
 
@@ -208,6 +158,5 @@ export default function Home() {
           <div className="text-muted-foreground">Satisfaction client</div>
         </div>
       </section>
-    </div>
-  )
+    </div>;
 }
