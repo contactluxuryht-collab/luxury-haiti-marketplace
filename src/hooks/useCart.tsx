@@ -8,6 +8,8 @@ export interface CartItem {
   user_id: string
   product_id: string
   quantity: number
+  selected_color?: string | null
+  selected_size?: string | null
   created_at: string
 }
 
@@ -66,7 +68,7 @@ export function useCart() {
     }
   }
 
-  const addToCart = async (productId: string, quantity: number = 1) => {
+  const addToCart = async (productId: string, quantity: number = 1, selectedColor?: string, selectedSize?: string) => {
     if (!user) {
       toast({
         title: "Authentication required",
@@ -89,23 +91,32 @@ export function useCart() {
       // Check if item already exists in cart
       const existingItem = cartItems.find(item => item.product_id === productId)
 
-      if (existingItem) {
-        // Update quantity
+      // Check if item with same color/size already exists
+      const exactMatch = cartItems.find(item => 
+        item.product_id === productId && 
+        item.selected_color === (selectedColor || null) &&
+        item.selected_size === (selectedSize || null)
+      )
+
+      if (exactMatch) {
+        // Update quantity for exact match
         const { error } = await supabase
           .from('cart')
-          .update({ quantity: existingItem.quantity + quantity })
-          .eq('id', existingItem.id)
+          .update({ quantity: exactMatch.quantity + quantity })
+          .eq('id', exactMatch.id)
 
         if (error) throw error
       } else {
-        // Add new item
+        // Add new item with selected options
         const { error } = await supabase
           .from('cart')
           .insert([
             {
               user_id: userData.id,
               product_id: productId,
-              quantity
+              quantity,
+              selected_color: selectedColor || null,
+              selected_size: selectedSize || null
             }
           ])
 
