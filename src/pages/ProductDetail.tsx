@@ -250,10 +250,10 @@ export default function ProductDetail() {
           </div>
         <div className="text-xs text-muted-foreground">Vendus: {soldCount}</div>
           
-          {/* Color and Size Selection */}
-          {(product as any).colors && (product as any).colors.length > 0 && (
+          {/* Color Selection - Only show if product has multiple colors */}
+          {(product as any).colors && (product as any).colors.length > 1 && (
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Couleur</Label>
+              <Label className="text-sm font-medium">Couleur (choisir une seule option)</Label>
               <RadioGroup value={selectedColor} onValueChange={setSelectedColor} className="flex flex-wrap gap-2">
                 {(product as any).colors.map((color: string) => (
                   <div key={color} className="flex items-center space-x-2">
@@ -265,9 +265,10 @@ export default function ProductDetail() {
             </div>
           )}
           
-          {(product as any).size && (
+          {/* Size Selection - Only show if product has multiple sizes */}
+          {(product as any).size && (product as any).size.split(',').length > 1 && (
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Taille</Label>
+              <Label className="text-sm font-medium">Taille (choisir une seule option)</Label>
               <RadioGroup value={selectedSize} onValueChange={setSelectedSize} className="flex flex-wrap gap-2">
                 {(product as any).size.split(',').map((size: string) => (
                   <div key={size.trim()} className="flex items-center space-x-2">
@@ -285,8 +286,8 @@ export default function ProductDetail() {
               variant="luxury" 
               onClick={() => addToCart(product.id, 1, selectedColor, selectedSize)}
               disabled={
-                ((product as any).colors?.length > 0 && !selectedColor) ||
-                ((product as any).size && !selectedSize)
+                ((product as any).colors?.length > 1 && !selectedColor) ||
+                ((product as any).size && (product as any).size.split(',').length > 1 && !selectedSize)
               }
             >
               {t('add_to_cart')}
@@ -298,8 +299,8 @@ export default function ProductDetail() {
                 navigate('/checkout')
               }}
               disabled={
-                ((product as any).colors?.length > 0 && !selectedColor) ||
-                ((product as any).size && !selectedSize)
+                ((product as any).colors?.length > 1 && !selectedColor) ||
+                ((product as any).size && (product as any).size.split(',').length > 1 && !selectedSize)
               }
             >
               Acheter maintenant
