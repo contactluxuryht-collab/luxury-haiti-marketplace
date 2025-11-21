@@ -7,6 +7,10 @@ import { useCart } from "@/hooks/useCart"
 import { MessageCircle } from "lucide-react"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { useSettings } from "@/hooks/useSettings"
+import Zoom from 'react-medium-image-zoom'
+import 'react-medium-image-zoom/dist/styles.css'
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 type LoadedProduct = {
   id: string
@@ -36,6 +40,8 @@ export default function ProductDetail() {
   const [newComment, setNewComment] = useState<string>("")
   const [soldCount, setSoldCount] = useState<number>(0)
   const [activeOffer, setActiveOffer] = useState<{ amount: number; threshold: number } | null>(null)
+  const [selectedColor, setSelectedColor] = useState<string>("")
+  const [selectedSize, setSelectedSize] = useState<string>("")
   const { addToWishlist, isInWishlist } = useWishlist()
   const { addToCart } = useCart()
   const { formatPrice, t } = useSettings()
@@ -208,14 +214,18 @@ export default function ProductDetail() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="rounded-xl overflow-hidden border border-border/50 bg-gradient-card">
           {([product.image_url, ...extraImages].filter(Boolean) as string[]).length <= 1 ? (
-            <img src={product.image_url || "/placeholder.svg"} alt={product.title} className="w-full h-auto" />
+            <Zoom>
+              <img src={product.image_url || "/placeholder.svg"} alt={product.title} className="w-full h-auto cursor-zoom-in" />
+            </Zoom>
           ) : (
             <div className="relative p-4">
               <Carousel className="w-full">
                 <CarouselContent>
                   {([product.image_url!, ...extraImages].filter(Boolean) as string[]).map((src, idx) => (
                     <CarouselItem key={idx}>
-                      <img src={src} alt={`${product.title}-${idx + 1}`} className="w-full h-96 object-contain bg-background" />
+                      <Zoom>
+                        <img src={src} alt={`${product.title}-${idx + 1}`} className="w-full h-96 object-contain bg-background cursor-zoom-in" />
+                      </Zoom>
                     </CarouselItem>
                   ))}
                 </CarouselContent>
@@ -240,13 +250,58 @@ export default function ProductDetail() {
           </div>
         <div className="text-xs text-muted-foreground">Vendus: {soldCount}</div>
           
-          {/* Action Buttons - Moved here after "Vendus" */}
+          {/* Color and Size Selection */}
+          {(product as any).colors && (product as any).colors.length > 0 && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Couleur</Label>
+              <RadioGroup value={selectedColor} onValueChange={setSelectedColor} className="flex flex-wrap gap-2">
+                {(product as any).colors.map((color: string) => (
+                  <div key={color} className="flex items-center space-x-2">
+                    <RadioGroupItem value={color} id={`color-${color}`} />
+                    <Label htmlFor={`color-${color}`} className="cursor-pointer">{color}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+          )}
+          
+          {(product as any).size && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Taille</Label>
+              <RadioGroup value={selectedSize} onValueChange={setSelectedSize} className="flex flex-wrap gap-2">
+                {(product as any).size.split(',').map((size: string) => (
+                  <div key={size.trim()} className="flex items-center space-x-2">
+                    <RadioGroupItem value={size.trim()} id={`size-${size.trim()}`} />
+                    <Label htmlFor={`size-${size.trim()}`} className="cursor-pointer">{size.trim()}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+          )}
+          
+          {/* Action Buttons */}
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button variant="luxury" onClick={() => addToCart(product.id, 1)}>{t('add_to_cart')}</Button>
-            <Button variant="default" onClick={() => {
-              addToCart(product.id, 1)
-              navigate('/checkout')
-            }}>
+            <Button 
+              variant="luxury" 
+              onClick={() => addToCart(product.id, 1, selectedColor, selectedSize)}
+              disabled={
+                ((product as any).colors?.length > 0 && !selectedColor) ||
+                ((product as any).size && !selectedSize)
+              }
+            >
+              {t('add_to_cart')}
+            </Button>
+            <Button 
+              variant="default" 
+              onClick={() => {
+                addToCart(product.id, 1, selectedColor, selectedSize)
+                navigate('/checkout')
+              }}
+              disabled={
+                ((product as any).colors?.length > 0 && !selectedColor) ||
+                ((product as any).size && !selectedSize)
+              }
+            >
               Acheter maintenant
             </Button>
             {waLink && (

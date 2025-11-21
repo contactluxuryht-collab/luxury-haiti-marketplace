@@ -278,6 +278,12 @@ export default function Checkout() {
                           />
                           <div className="flex-1">
                             <h3 className="font-medium">{i.product!.title}</h3>
+                            {(i.selected_color || i.selected_size) && (
+                              <div className="flex gap-2 text-xs text-muted-foreground">
+                                {i.selected_color && <span>Couleur: {i.selected_color}</span>}
+                                {i.selected_size && <span>Taille: {i.selected_size}</span>}
+                              </div>
+                            )}
                             <p className="text-sm text-muted-foreground">Quantity: {i.quantity}</p>
                           </div>
                           <div className="text-right">

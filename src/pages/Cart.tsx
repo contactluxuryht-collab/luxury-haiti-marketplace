@@ -146,6 +146,12 @@ export default function Cart() {
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-lg truncate">{item.product!.title}</h3>
+                      {(item.selected_color || item.selected_size) && (
+                        <div className="flex gap-2 text-xs text-muted-foreground mt-1">
+                          {item.selected_color && <span>Couleur: {item.selected_color}</span>}
+                          {item.selected_size && <span>Taille: {item.selected_size}</span>}
+                        </div>
+                      )}
                       <p className="text-sm text-muted-foreground">
                         Prix unitaire: {formatPrice(item.product!.price)}
                       </p>
